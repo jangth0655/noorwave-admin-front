@@ -1,28 +1,99 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+
+import { LoginArgs, LoginData, login } from "@/services/login";
 import LoginInput from "./LoginInput";
 
+import { ServerError } from "@/services/httpClient";
+import { cookieAction } from "@/app/(auth)/action";
+import { useRouter } from "next/navigation";
+
+export type Form = {
+  email: string;
+  password: string;
+};
+
 export default function Login() {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid, errors },
+  } = useForm<Form>({
+    mode: "onChange",
+  });
+
+  const { error, mutate } = useMutation<LoginData, ServerError, LoginArgs>({
+    mutationKey: ["login"],
+    mutationFn: login,
+    onSuccess: (data) => {
+      cookieAction(data.access_token);
+      router.replace("/dash-board");
+    },
+  });
+
+  const onSubmit = async (data: Form) => {
+    const { email, password } = data;
+    if (email && password) {
+      mutate({
+        login_id: email,
+        password,
+      });
+    }
+  };
+
+  const errorStateMessage = errors.email?.message || errors.password?.message;
+
   return (
-    <section className="h-screen flex justify-center items-center text-slate-700">
-      <div className="w-[512px]">
+    <section className="h-screen flex justify-center items-center text-slate-700 px-4">
+      <div className="w-[512px] h-hull py-10 relative">
         <h1 className="text-4xl font-bold mb-10 text-center">Noorwave Admin</h1>
 
-        <form action="" className="w-full flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <LoginInput labelText="Email" htmlFor="email" />
-            <LoginInput
-              labelText="Password"
-              type="password"
-              htmlFor="password"
-            />
-          </div>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full flex flex-col gap-6"
+        >
+          <LoginInput
+            labelText="Email"
+            htmlFor="email"
+            maxLength={18}
+            type="text"
+            name="email"
+            register={register("email", {
+              required: "이메일을 입력해주세요.",
+            })}
+          />
+          <LoginInput
+            labelText="Password"
+            type="password"
+            htmlFor="password"
+            maxLength={25}
+            name="password"
+            register={register("password", {
+              required: "패스워드를 입력해주세요.",
+            })}
+          />
 
           <button
             type="submit"
-            className="w-full py-3 flex justify-center items-center bg-slate-600 text-white text-xl rounded-xl active:bg-slate-800 transition-all active:scale-95"
+            disabled={!isValid}
+            className="w-full py-3 flex justify-center items-center bg-slate-600 text-white text-xl rounded-xl active:bg-slate-800 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100 disabled:active:bg-slate-600"
           >
             Login
           </button>
         </form>
+        {(error?.statusCode === 422 || error?.statusCode === 403) && (
+          <p className="mt-4 text-rose-500 font-bold absolute bottom-0">
+            아이디 및 패스워드가 올바르지 않습니다.
+          </p>
+        )}
+        {errorStateMessage && (
+          <p className="mt-4 text-rose-500 font-bold absolute bottom-0">
+            {errorStateMessage}
+          </p>
+        )}
       </div>
     </section>
   );
