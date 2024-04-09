@@ -2,13 +2,14 @@
 
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { LoginArgs, LoginData, login } from "@/services/login";
 import LoginInput from "./LoginInput";
+import Loading from "../Loading";
 
 import { ServerError } from "@/services/httpClient";
 import { cookieAction } from "@/app/(auth)/action";
-import { useRouter } from "next/navigation";
 
 export type Form = {
   email: string;
@@ -25,7 +26,11 @@ export default function Login() {
     mode: "onChange",
   });
 
-  const { error, mutate } = useMutation<LoginData, ServerError, LoginArgs>({
+  const { error, mutate, isPending } = useMutation<
+    LoginData,
+    ServerError,
+    LoginArgs
+  >({
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: (data) => {
@@ -36,6 +41,7 @@ export default function Login() {
 
   const onSubmit = async (data: Form) => {
     const { email, password } = data;
+
     if (email && password) {
       mutate({
         login_id: email,
@@ -81,12 +87,18 @@ export default function Login() {
             disabled={!isValid}
             className="w-full py-3 flex justify-center items-center bg-slate-600 text-white text-xl rounded-xl active:bg-slate-800 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100 disabled:active:bg-slate-600"
           >
-            Login
+            {isPending ? <Loading /> : <span>Login</span>}
           </button>
         </form>
+
         {(error?.statusCode === 422 || error?.statusCode === 403) && (
           <p className="mt-4 text-rose-500 font-bold absolute bottom-0">
             아이디 및 패스워드가 올바르지 않습니다.
+          </p>
+        )}
+        {error?.statusCode === 500 && (
+          <p className="mt-4 text-rose-500 font-bold absolute bottom-0">
+            네트워크 또는 서버에러가 발생하였습니다.
           </p>
         )}
         {errorStateMessage && (
