@@ -1,3 +1,3 @@
 export default function DashBoardPage() {
-  return <></>;
+  return <div>DashBoard</div>;
 }

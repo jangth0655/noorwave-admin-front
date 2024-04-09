@@ -4,13 +4,15 @@ import { getCookie } from "cookies-next";
 
 export type ServerError = { statusCode: number; errorMessage: string };
 
+export const ACCESS_TOKEN = "access_token";
+
 export const api = axios.create({
   baseURL: "/api/v1",
 });
 
 api.interceptors.request.use(
   async (config) => {
-    const token = getCookie("access_token");
+    const token = getCookie(ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
