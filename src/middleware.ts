@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { ACCESS_TOKEN } from "./services/httpClient";
 
 export async function middleware(request: NextRequest) {
-  const token = cookies().get(ACCESS_TOKEN);
+  const token = cookies().get(ACCESS_TOKEN)?.value;
   const pathname = request.nextUrl.pathname;
 
-  if ((token && pathname === "/dash-board") || (!token && pathname === "/")) {
+  /* if ((token && pathname === "/dash-board") || (!token && pathname === "/")) {
     return NextResponse.next();
   }
 
@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dash-board", request.url));
   } else {
     return NextResponse.redirect(new URL("/", request.url));
-  }
+  } */
 }
 
 export const config = {

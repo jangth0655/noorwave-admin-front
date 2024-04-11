@@ -9,6 +9,7 @@ import Loading from "../Loading";
 
 import { ServerError } from "@/services/httpClient";
 import { cookieAction } from "@/app/(auth)/action";
+import MainTitle from "../MainTitle";
 
 export type Form = {
   email: string;
@@ -50,9 +51,9 @@ export default function Login() {
   const errorStateMessage = errors.email?.message || errors.password?.message;
 
   return (
-    <section className="h-screen flex justify-center items-center text-slate-700 px-4">
+    <section className="h-screen flex justify-center items-center px-4">
       <div className="w-[512px] h-hull py-10 relative">
-        <h1 className="text-4xl font-bold mb-10 text-center">Noorwave Admin</h1>
+        <MainTitle />
 
         <form
           onSubmit={handleSubmit(onSubmit)}

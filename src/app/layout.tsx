@@ -18,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <main className="text-slate-900">{children}</main>
+        </QueryProvider>
       </body>
     </html>
   );
