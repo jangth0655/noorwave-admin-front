@@ -29,6 +29,10 @@ export default function DashBoard() {
 
 export const tableHead = [
   {
+    name: "ID",
+    key: "id",
+  },
+  {
     name: "이름",
     key: "name",
   },
