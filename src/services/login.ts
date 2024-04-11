@@ -14,5 +14,6 @@ export const login = async ({ login_id, password }: LoginArgs) => {
       password,
     })
   ).data;
+  console.log("login ", response);
   return response;
 };
