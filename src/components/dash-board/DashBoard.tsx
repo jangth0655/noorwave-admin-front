@@ -11,11 +11,11 @@ import UserCreateModal from "./modal/UserCreateModal";
 export default function DashBoard() {
   const [isCreateModal, setIsCreateModal] = useState(false);
 
-  const onIsCreateUser = () => {
+  const onCreateModal = () => {
     setIsCreateModal(true);
   };
 
-  const closeIsCreateUser = () => {
+  const onCloseCreateModal = () => {
     setIsCreateModal(false);
   };
 
@@ -28,7 +28,7 @@ export default function DashBoard() {
 
           <div className="flex items-center gap-6">
             <Button
-              onClick={onIsCreateUser}
+              onClick={onCreateModal}
               text="추가"
               width={80}
               height={40}
@@ -44,7 +44,7 @@ export default function DashBoard() {
       {isCreateModal && (
         <Modal>
           <div>
-            <UserCreateModal />
+            <UserCreateModal onCloseCreateModal={onCloseCreateModal} />
           </div>
         </Modal>
       )}

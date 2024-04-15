@@ -6,16 +6,11 @@ import UserEditInput from "../UserEditInput";
 
 import UserDateInput from "../UserDateInput";
 import { stringDateSplit } from "@/utils/formatDate";
+import { UserDataForm } from "./UserCreateModal";
 
 type Props = {
   userDetail: UserInfo;
   onCloseDetailModal: () => void;
-};
-
-type UserDataForm = {
-  name: string;
-  email: string;
-  phone: string;
 };
 
 export default function UserDetailModal({
@@ -60,11 +55,8 @@ export default function UserDetailModal({
                   {item.purchase_order}
                 </span>
                 <div className="flex-2 py-1 px-2 rounded-md flex items-center">
-                  <UserDateInput
-                    dateText="년"
-                    date={stringDateSplit(item.purchase_date, "year")}
-                    name="year"
-                  />
+                  {/* <UserDateInput
+                  /> */}
                 </div>
                 <button className="py-1 bg-slate-200 rounded-md w-20 hover:bg-slate-400 hover:text-white transition-all">
                   초기화

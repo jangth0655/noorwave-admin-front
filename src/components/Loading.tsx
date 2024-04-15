@@ -1,6 +1,6 @@
 type Props = {
-  width?: string;
-  height?: string;
+  width?: number;
+  height?: number;
 };
 
 export default function Loading({ height, width }: Props) {

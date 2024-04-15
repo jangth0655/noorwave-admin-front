@@ -1,7 +1,25 @@
 import { api } from "./httpClient";
 
 export const getUsers = async () => {
-  const response: User = await (await api.get("/user")).data;
+  const response = await (await api.get<Promise<User>>("/user")).data;
+  return response;
+};
+
+export type CreateUserArgs = Pick<
+  UserInfo,
+  "email" | "name" | "phone" | "purchases"
+>;
+
+export const createUser = async (args: CreateUserArgs) => {
+  const { email, name, phone, purchases } = args;
+  const response = await (
+    await api.post<Promise<{ message: string }>>("/user", {
+      name,
+      email,
+      phone,
+      purchases,
+    })
+  ).data;
   return response;
 };
 
@@ -24,8 +42,8 @@ export type UserInfo = {
 };
 
 export type UserPurchase = {
-  id: number;
-  purchase_date: string;
-  purchase_order: number;
-  quantity: number;
+  id?: number;
+  purchase_date?: string;
+  purchase_order?: number;
+  quantity?: number;
 };

@@ -60,6 +60,7 @@ export default function Login() {
           className="w-full flex flex-col gap-6"
         >
           <LoginInput
+            defaultValue="admin@noorwave-ex.com"
             labelText="Email"
             htmlFor="email"
             maxLength={30}
@@ -70,6 +71,7 @@ export default function Login() {
             })}
           />
           <LoginInput
+            defaultValue="qhRdmarlacl12@"
             labelText="Password"
             type="password"
             htmlFor="password"
