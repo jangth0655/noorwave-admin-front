@@ -62,7 +62,7 @@ export default function Login() {
           <LoginInput
             labelText="Email"
             htmlFor="email"
-            maxLength={18}
+            maxLength={30}
             type="text"
             name="email"
             register={register("email", {

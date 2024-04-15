@@ -32,11 +32,11 @@ export default function UserTableBody({ userList }: Props) {
     setIsModal(false);
   };
 
-  useCloseOnOutSideClick({
+  /*   useCloseOnOutSideClick({
     exceptRefsArray: [modalExceptRef],
     close: onCloseModal,
     isOutSideClose: true,
-  });
+  }); */
 
   return (
     <>
