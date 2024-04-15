@@ -13,7 +13,7 @@ export type CreateUserArgs = Pick<
 export const createUser = async (args: CreateUserArgs) => {
   const { email, name, phone, purchases } = args;
   const response = await (
-    await api.post<Promise<{ message: string }>>("/user", {
+    await api.post<Promise<UserEditResult>>("/user", {
       name,
       email,
       phone,
@@ -21,6 +21,21 @@ export const createUser = async (args: CreateUserArgs) => {
     })
   ).data;
   return response;
+};
+
+export const deleteUser = async (...id: number[]) => {
+  const response = await (
+    await api.delete<Promise<UserEditResult>>("/user", {
+      data: {
+        id,
+      },
+    })
+  ).data;
+  return response;
+};
+
+export type UserEditResult = {
+  message: string;
 };
 
 export type User = {

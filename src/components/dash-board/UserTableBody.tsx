@@ -7,6 +7,7 @@ import Modal from "../Modal";
 import { useCloseOnOutSideClick } from "@/hooks/useCloseOnOutSideClick";
 import { cls } from "@/utils/cls";
 import UserDetailModal from "./modal/UserDetailModal";
+import CheckBox from "./CheckBox";
 
 type Props = {
   userList?: UserInfo[];
@@ -20,6 +21,7 @@ type ClickedUser = {
 export default function UserTableBody({ userList }: Props) {
   const [isModal, setIsModal] = useState(false);
   const [clickedUser, setClickedUser] = useState<ClickedUser | undefined>();
+  const [checkedId, setCheckedId] = useState<number[]>([]);
   const modalExceptRef = useRef(null);
 
   const onUserInfo = (event: React.MouseEvent, user: ClickedUser) => {
@@ -38,6 +40,18 @@ export default function UserTableBody({ userList }: Props) {
     isOutSideClose: true,
   }); */
 
+  const onCheck = (e: React.MouseEvent<HTMLElement>, userId: number) => {
+    e.stopPropagation();
+    const isAlreadyChecked = checkedId.includes(userId);
+    if (isAlreadyChecked) {
+      setCheckedId(checkedId.filter((id) => id !== userId));
+    } else {
+      setCheckedId([...checkedId, userId]);
+    }
+  };
+
+  console.log(checkedId);
+
   return (
     <>
       <tbody>
@@ -50,9 +64,12 @@ export default function UserTableBody({ userList }: Props) {
                 clickedUser?.purchase.id === purchase.id
                   ? "bg-slate-700 text-white"
                   : "",
-                "cursor-pointer transition-all"
+                "cursor-pointer transition-all hover"
               )}
             >
+              <td>
+                <CheckBox onClick={(e) => onCheck(e, user.id)} />
+              </td>
               <td className="text-center">{purchase.id}</td>
               <td className="text-center">{user.name}</td>
               <td className="text-center">{user.email}</td>
