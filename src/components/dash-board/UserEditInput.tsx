@@ -7,7 +7,7 @@ type Props = {
   register?: UseFormRegisterReturn;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-export default function UserDetailInput({
+export default function UserEditInput({
   labelText,
   htmlFor,
   register,

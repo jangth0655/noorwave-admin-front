@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import Modal from "../Modal";
 import { useCloseOnOutSideClick } from "@/hooks/useCloseOnOutSideClick";
 import { cls } from "@/utils/cls";
-import UserDetailModal from "./userDetail/UserDetailModal";
+import UserDetailModal from "./modal/UserDetailModal";
 
 type Props = {
   userList?: UserInfo[];
