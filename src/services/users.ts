@@ -1,19 +1,16 @@
-import { api } from "./httpClient";
+import { api } from './httpClient';
 
 export const getUsers = async () => {
-  const response = await (await api.get<Promise<User>>("/user")).data;
+  const response = await (await api.get<Promise<User>>('/user')).data;
   return response;
 };
 
-export type CreateUserArgs = Pick<
-  UserInfo,
-  "email" | "name" | "phone" | "purchases"
->;
+export type CreateUserArgs = Pick<UserInfo, 'email' | 'name' | 'phone' | 'purchases'>;
 
 export const createUser = async (args: CreateUserArgs) => {
   const { email, name, phone, purchases } = args;
   const response = await (
-    await api.post<Promise<UserEditResult>>("/user", {
+    await api.post<Promise<UserEditResult>>('/user', {
       name,
       email,
       phone,
@@ -23,9 +20,9 @@ export const createUser = async (args: CreateUserArgs) => {
   return response;
 };
 
-export const deleteUser = async (...id: number[]) => {
+export const deleteUser = async (id: number[]) => {
   const response = await (
-    await api.delete<Promise<UserEditResult>>("/user", {
+    await api.delete<Promise<UserEditResult>>('/user', {
       data: {
         id,
       },

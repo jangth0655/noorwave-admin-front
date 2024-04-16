@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { UserInfo, UserPurchase } from "@/services/users";
-import { useRef, useState } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
-import Modal from "../Modal";
-import { useCloseOnOutSideClick } from "@/hooks/useCloseOnOutSideClick";
-import { cls } from "@/utils/cls";
-import UserDetailModal from "./modal/UserDetailModal";
-import CheckBox from "./CheckBox";
+import { cls } from '@/utils/cls';
+import Modal from '../Modal';
+import UserDetailModal from './modal/UserDetailModal';
+import CheckBox from './CheckBox';
+
+import { UserInfo, UserPurchase } from '@/services/users';
 
 type Props = {
   userList?: UserInfo[];
@@ -21,8 +22,6 @@ type ClickedUser = {
 export default function UserTableBody({ userList }: Props) {
   const [isModal, setIsModal] = useState(false);
   const [clickedUser, setClickedUser] = useState<ClickedUser | undefined>();
-  const [checkedId, setCheckedId] = useState<number[]>([]);
-  const modalExceptRef = useRef(null);
 
   const onUserInfo = (event: React.MouseEvent, user: ClickedUser) => {
     event.stopPropagation();
@@ -34,23 +33,20 @@ export default function UserTableBody({ userList }: Props) {
     setIsModal(false);
   };
 
-  /*   useCloseOnOutSideClick({
-    exceptRefsArray: [modalExceptRef],
-    close: onCloseModal,
-    isOutSideClose: true,
-  }); */
-
+  const queryClient = useQueryClient();
   const onCheck = (e: React.MouseEvent<HTMLElement>, userId: number) => {
     e.stopPropagation();
-    const isAlreadyChecked = checkedId.includes(userId);
-    if (isAlreadyChecked) {
-      setCheckedId(checkedId.filter((id) => id !== userId));
-    } else {
-      setCheckedId([...checkedId, userId]);
-    }
-  };
+    const currentCheckedIds = queryClient.getQueryData<number[]>(['checkedUserIds']) || [];
+    let newCheckedIds;
 
-  console.log(checkedId);
+    if (currentCheckedIds.includes(userId)) {
+      newCheckedIds = currentCheckedIds.filter((id) => id !== userId);
+    } else {
+      newCheckedIds = [...currentCheckedIds, userId];
+    }
+
+    queryClient.setQueryData(['checkedUserIds'], newCheckedIds);
+  };
 
   return (
     <>
@@ -61,32 +57,27 @@ export default function UserTableBody({ userList }: Props) {
               onClick={(event) => onUserInfo(event, { info: user, purchase })}
               key={`user-${user.id}-purchase-${index}`}
               className={cls(
-                clickedUser?.purchase.id === purchase.id
-                  ? "bg-slate-700 text-white"
-                  : "",
-                "cursor-pointer transition-all hover"
+                clickedUser?.purchase.id === purchase.id ? 'bg-slate-700 text-white' : '',
+                'cursor-pointer transition-all hover *:text-center'
               )}
             >
               <td>
                 <CheckBox onClick={(e) => onCheck(e, user.id)} />
               </td>
-              <td className="text-center">{purchase.id}</td>
-              <td className="text-center">{user.name}</td>
-              <td className="text-center">{user.email}</td>
-              <td className="text-center">{user.phone}</td>
-              <td className="text-center">{purchase.purchase_order}</td>
-              <td className="text-center">{purchase.quantity}</td>
+              <td>{purchase.id}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.phone}</td>
+              <td>{purchase.purchase_order}</td>
+              <td>{purchase.quantity}</td>
             </tr>
           ))
         )}
       </tbody>
       {isModal && clickedUser && (
         <Modal>
-          <div ref={modalExceptRef}>
-            <UserDetailModal
-              userDetail={clickedUser.info}
-              onCloseDetailModal={onCloseModal}
-            />
+          <div>
+            <UserDetailModal userDetail={clickedUser.info} onCloseDetailModal={onCloseModal} />
           </div>
         </Modal>
       )}

@@ -1,15 +1,34 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import Button from "../Button";
-import UserSearchForm from "./UserSearchForm";
-import UserTableList from "./UserTableList";
-import Modal from "../Modal";
-import UserCreateModal from "./modal/UserCreateModal";
+import Button from '../Button';
+import UserSearchForm from './UserSearchForm';
+import UserTableList from './UserTableList';
+import Modal from '../Modal';
+import UserCreateModal from './modal/UserCreateModal';
+
+import { UserEditResult, deleteUser } from '@/services/users';
+import { ServerError } from '@/services/httpClient';
 
 export default function DashBoard() {
   const [isCreateModal, setIsCreateModal] = useState(false);
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteUserMutate,
+    isPending,
+    error,
+  } = useMutation<UserEditResult, ServerError, number[]>({
+    mutationFn: deleteUser,
+    mutationKey: ['delete-user'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users'],
+      });
+    },
+  });
 
   const onCreateModal = () => {
     setIsCreateModal(true);
@@ -17,6 +36,12 @@ export default function DashBoard() {
 
   const onCloseCreateModal = () => {
     setIsCreateModal(false);
+  };
+
+  const onDeleteUser = () => {
+    const checkedUsers = queryClient.getQueryData(['checkedUserIds']) as number[];
+    if (!checkedUsers || checkedUsers.length === 0) return;
+    deleteUserMutate(checkedUsers);
   };
 
   return (
@@ -27,13 +52,8 @@ export default function DashBoard() {
           <UserSearchForm />
 
           <div className="flex items-center gap-6">
-            <Button
-              onClick={onCreateModal}
-              text="추가"
-              width={80}
-              height={40}
-            />
-            <Button text="선택 삭제" width={80} height={40} />
+            <Button onClick={onCreateModal} text="추가" width={80} height={40} />
+            <Button onClick={onDeleteUser} text="선택 삭제" width={80} height={40} />
           </div>
         </div>
         <div>
