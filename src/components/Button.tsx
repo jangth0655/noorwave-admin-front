@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes } from 'react';
 
 type Props = {
   text: string;
@@ -8,14 +8,7 @@ type Props = {
   bgColor?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function Button({
-  text,
-  width,
-  height,
-  bgColor,
-  fontSize,
-  ...rest
-}: Props) {
+export default function Button({ text, width, height, bgColor, fontSize, ...rest }: Props) {
   return (
     <button
       style={{
@@ -24,7 +17,7 @@ export default function Button({
         fontSize,
       }}
       {...rest}
-      className="p-2 rounded-xl hover:bg-slate-900 bg-slate-700 text-white transition-all"
+      className="p-2 rounded-xl hover:bg-slate-900 bg-slate-700 text-white transition-all flex items-center justify-center"
     >
       {text}
     </button>

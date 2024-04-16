@@ -13,6 +13,7 @@ import { ServerError } from '@/services/httpClient';
 import { CreateUserArgs, createUser } from '@/services/users';
 import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
+import ErrorModal from './ErrorModal';
 
 type Props = {
   onCloseCreateModal: () => void;
@@ -235,11 +236,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       {isError && (
         <Modal>
           <div>
-            <div className="bg-white w-[320px] h-48 rounded-xl shadow-lg flex justify-center items-center">
-              {createError?.statusCode === 401 && <ErrorMessage text="로그인이 필요합니다." />}
-              {createError?.statusCode === 500 && <ErrorMessage text="올바르지 않은 요청입니다." />}
-              {createError?.statusCode === 500 && <ErrorMessage text="서버 및 네트워크 통신 에러가 발생했습니다." />}
-            </div>
+            <ErrorModal errorMessage={createError.errorMessage} onCloseModal={onCloseCreateModal} />
           </div>
         </Modal>
       )}
