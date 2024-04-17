@@ -9,6 +9,7 @@ import UserEditModal from './modal/UserEditModal';
 import CheckBox from './CheckBox';
 
 import { UserInfo, UserPurchase } from '@/services/users';
+import { formatToWon } from '@/utils/formatToCurrency';
 
 type Props = {
   userList?: UserInfo[];
@@ -51,26 +52,27 @@ export default function UserTableBody({ userList }: Props) {
   return (
     <>
       <tbody>
-        {userList?.flatMap((user) =>
-          user.purchases.map((purchase, index) => (
-            <tr
-              onClick={(event) => onUserInfo(event, { info: user, purchase })}
-              key={`user-${user.id}-purchase-${index}`}
-              tabIndex={0}
-              className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white"
-            >
-              <td>
-                <CheckBox onClick={(e) => onCheck(e, user.id)} />
-              </td>
-              <td>{purchase.id}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>{user.phone}</td>
-              <td>{purchase.purchase_order}</td>
-              <td>{purchase.quantity}</td>
-            </tr>
-          ))
-        )}
+        {userList?.length !== 0 &&
+          userList?.flatMap((user) =>
+            user.purchases.map((purchase, index) => (
+              <tr
+                onClick={(event) => onUserInfo(event, { info: user, purchase })}
+                key={`user-${user.id}-purchase-${index}`}
+                tabIndex={0}
+                className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white"
+              >
+                <td>
+                  <CheckBox onClick={(e) => onCheck(e, user.id)} />
+                </td>
+                <td>{purchase.id}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+                <td>{purchase.purchase_order}</td>
+                <td>{formatToWon(purchase.quantity as number)}</td>
+              </tr>
+            ))
+          )}
       </tbody>
       {isModal && clickedUser && (
         <Modal>

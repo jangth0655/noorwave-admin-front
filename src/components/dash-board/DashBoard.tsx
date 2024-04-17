@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import Button from '../Button';
 import UserSearchForm from './UserSearchForm';
@@ -13,12 +14,12 @@ import { UserEditResult, deleteUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 import Loading from '../Loading';
 import ErrorModal from './modal/ErrorModal';
-import { useRouter } from 'next/navigation';
 
 export default function DashBoard() {
   const router = useRouter();
   const [isCreateModal, setIsCreateModal] = useState(false);
   const [isErrorModal, setIsErrorModal] = useState(false);
+  const [keyword, setKeyword] = useState<string>();
   const queryClient = useQueryClient();
 
   const {
@@ -61,12 +62,16 @@ export default function DashBoard() {
     deleteUserMutate(checkedUsers);
   };
 
+  const onKeyword = (word: string) => {
+    setKeyword(word);
+  };
+
   return (
     <>
       <div>
         <h2 className="text-xl font-semibold mb-5">회원 리스트</h2>
         <div className="flex justify-between items-center mb-6">
-          <UserSearchForm />
+          <UserSearchForm keyword={keyword} onKeyword={onKeyword} />
 
           <div className="flex items-center gap-6">
             <Button onClick={onCreateModal} text="추가" width={80} height={40} />
@@ -74,7 +79,7 @@ export default function DashBoard() {
           </div>
         </div>
         <div>
-          <UserTableList />
+          <UserTableList keyword={keyword} />
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, getUsers } from '@/services/users';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,18 +11,31 @@ import Modal from '../Modal';
 import ErrorModal from './modal/ErrorModal';
 import { ServerError } from '@/services/httpClient';
 
-export default function UserTableList() {
+type Props = {
+  keyword?: string;
+};
+
+export default function UserTableList({ keyword }: Props) {
   const router = useRouter();
   const [isErrorModal, setIsErrorModal] = useState(false);
+  const queryClient = useQueryClient();
   const {
     data: userList,
     isPending,
     error,
     isError,
   } = useQuery<User, ServerError>({
-    queryKey: ['users'],
-    queryFn: getUsers,
+    queryKey: ['users', keyword],
+    queryFn: () => getUsers(keyword),
   });
+
+  useEffect(() => {
+    if (keyword) {
+      queryClient.invalidateQueries({
+        queryKey: ['users'],
+      });
+    }
+  }, [keyword, queryClient]);
 
   useEffect(() => {
     if (isError) {
@@ -45,7 +58,15 @@ export default function UserTableList() {
     <div className="overflow-x-auto">
       <table className="table">
         <TableHead headList={tableHead} />
-        {isPending ? (
+        {userList?.items.length === 0 ? (
+          <tbody>
+            <tr>
+              <td colSpan={7} className="bg-slate-100 text-center">
+                검색 결과가 없습니다.
+              </td>
+            </tr>
+          </tbody>
+        ) : isPending ? (
           Array.from({ length: 15 }).map((_, index) => (
             <tbody key={index} className="bg-neutral-500 animate-pulse">
               <tr className="rounded-xl overflow-hidden *:rounded-md">

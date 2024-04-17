@@ -1,7 +1,13 @@
 import { api } from './httpClient';
 
-export const getUsers = async () => {
-  const response = await (await api.get<Promise<User>>('/user')).data;
+export const getUsers = async (search?: string) => {
+  const response = await (
+    await api.get<Promise<User>>('/user', {
+      params: {
+        search,
+      },
+    })
+  ).data;
   return response;
 };
 
