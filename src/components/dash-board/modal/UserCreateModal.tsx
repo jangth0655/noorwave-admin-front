@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { formatYYYYMMDD } from '@/utils/formatDate';
 
-import { CreateUserArgs, createUser } from '@/services/users';
+import { AddAndEditUserArgs, createUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 
 import UserEditInput from '../UserEditInput';
@@ -28,7 +28,7 @@ export type DateForm = {
   date?: Date;
   order?: number;
   quantity?: number;
-  id: number;
+  id?: number;
 };
 
 export type UserDataForm = {
@@ -58,7 +58,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     isPending: isCreateLoading,
     error: createError,
     isError,
-  } = useMutation<{ message: string }, ServerError, CreateUserArgs>({
+  } = useMutation<{ message: string }, ServerError, AddAndEditUserArgs>({
     mutationKey: ['create-user'],
     mutationFn: createUser,
     onSuccess: (data) => {
@@ -83,6 +83,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
   const onSubmit = (data: UserDataForm) => {
     const { date, email, name, phone } = data;
+
     if (isNotDates) {
       setError('date', {
         message: '구매이력을 추가해주세요.',
@@ -162,55 +163,56 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           />
 
           <ul className="flex flex-col gap-4 relative">
-            {dates.map((date) => (
-              <li key={date.id} className="flex items-center justify-between">
-                <OrderSelector
-                  register={register(`date.${date.id}.order`, {
-                    required: {
-                      message: '차수를 선택해주세요.',
-                      value: true,
-                    },
-                  })}
-                />
-                <Controller
-                  key={date.id}
-                  name={`date.${date.id}.date`}
-                  rules={{ required: true }}
-                  control={control}
-                  render={({ field }) => <UserCalendarInput field={field} />}
-                />
-                <div>
-                  <input
-                    {...register(`date.${date.id}.quantity`, {
+            {dates.length !== 0 &&
+              dates.map((date) => (
+                <li key={date.id} className="flex items-center justify-between">
+                  <OrderSelector
+                    register={register(`date.${date.id as number}.order`, {
                       required: {
-                        message: '수량을 입력해주세요.',
+                        message: '차수를 선택해주세요.',
                         value: true,
                       },
                     })}
-                    type="number"
-                    placeholder="구매수량"
-                    className="border rounded-md px-2 placeholder:text-sm outline-none py-1"
                   />
-                </div>
+                  <Controller
+                    key={date.id}
+                    name={`date.${date.id as number}.date`}
+                    rules={{ required: true }}
+                    control={control}
+                    render={({ field }) => <UserCalendarInput field={field} />}
+                  />
+                  <div>
+                    <input
+                      {...register(`date.${date.id as number}.quantity`, {
+                        required: {
+                          message: '구매 수량을 입력해주세요.',
+                          value: true,
+                        },
+                      })}
+                      type="number"
+                      placeholder="구매수량"
+                      className="border rounded-md px-2 placeholder:text-sm outline-none py-1"
+                    />
+                  </div>
 
-                <div className="flex items-center gap-2 ml-1">
-                  <button
-                    onClick={() => onResetDateFields(date.id)}
-                    type="button"
-                    className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                  >
-                    초기화
-                  </button>
-                  <button
-                    onClick={() => onRemoveDateField(date.id)}
-                    type="button"
-                    className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                  >
-                    제거
-                  </button>
-                </div>
-              </li>
-            ))}
+                  <div className="flex items-center gap-2 ml-1">
+                    <button
+                      onClick={() => onResetDateFields(date.id as number)}
+                      type="button"
+                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                    >
+                      초기화
+                    </button>
+                    <button
+                      onClick={() => onRemoveDateField(date.id as number)}
+                      type="button"
+                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                    >
+                      제거
+                    </button>
+                  </div>
+                </li>
+              ))}
           </ul>
 
           <div className="my-4 flex items-center gap-2">

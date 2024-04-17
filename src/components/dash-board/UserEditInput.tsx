@@ -1,21 +1,16 @@
-import { InputHTMLAttributes } from "react";
-import { UseFormRegisterReturn } from "react-hook-form";
-import ErrorMessage from "./ErrorMessage";
+import { InputHTMLAttributes } from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
+import ErrorMessage from './ErrorMessage';
 
 type Props = {
   labelText: string;
-  htmlFor: "email" | "name" | "phone";
+  htmlFor: 'email' | 'name' | 'phone';
   register?: UseFormRegisterReturn;
   errorText?: string;
+  defaultValue?: string | number;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-export default function UserEditInput({
-  labelText,
-  htmlFor,
-  register,
-  errorText,
-  ...rest
-}: Props) {
+export default function UserEditInput({ labelText, htmlFor, register, errorText, defaultValue, ...rest }: Props) {
   return (
     <div className="flex flex-col gap-1 font-medium mb-6">
       <div className="flex items-center gap-4">
@@ -26,6 +21,7 @@ export default function UserEditInput({
         id={htmlFor}
         {...register}
         {...rest}
+        defaultValue={defaultValue}
         className="border rounded-md focus:ring ring-0 focus:ring-slate-700 transition-shadow py-1 pl-2"
       />
     </div>

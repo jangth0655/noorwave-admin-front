@@ -5,9 +5,9 @@ export const getUsers = async () => {
   return response;
 };
 
-export type CreateUserArgs = Pick<UserInfo, 'email' | 'name' | 'phone' | 'purchases'>;
+export type AddAndEditUserArgs = Pick<UserInfo, 'email' | 'name' | 'phone' | 'purchases'>;
 
-export const createUser = async (args: CreateUserArgs) => {
+export const createUser = async (args: AddAndEditUserArgs) => {
   const { email, name, phone, purchases } = args;
   const response = await (
     await api.post<Promise<UserEditResult>>('/user', {
@@ -17,6 +17,20 @@ export const createUser = async (args: CreateUserArgs) => {
       purchases,
     })
   ).data;
+  return response;
+};
+
+export const updateUser = async ({ userId, ...args }: AddAndEditUserArgs & { userId: number }) => {
+  const { email, name, phone, purchases } = args;
+  const response = await (
+    await api.patch(`/user/${userId}`, {
+      name,
+      email,
+      phone,
+      purchases,
+    })
+  ).data;
+
   return response;
 };
 

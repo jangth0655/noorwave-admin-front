@@ -5,10 +5,11 @@ import { useState } from 'react';
 
 import { cls } from '@/utils/cls';
 import Modal from '../Modal';
-import UserDetailModal from './modal/UserDetailModal';
+import UserEditModal from './modal/UserEditModal';
 import CheckBox from './CheckBox';
 
 import { UserInfo, UserPurchase } from '@/services/users';
+import dayjs from 'dayjs';
 
 type Props = {
   userList?: UserInfo[];
@@ -77,7 +78,7 @@ export default function UserTableBody({ userList }: Props) {
       {isModal && clickedUser && (
         <Modal>
           <div>
-            <UserDetailModal userDetail={clickedUser.info} onCloseDetailModal={onCloseModal} />
+            <UserEditModal userDetail={clickedUser.info} onCloseDetailModal={onCloseModal} />
           </div>
         </Modal>
       )}

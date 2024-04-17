@@ -20,6 +20,9 @@ export default class HttpError extends Error {
       case 403: {
         return (this.message = '잘못된 요청입니다.');
       }
+      case 404: {
+        return (this.message = '잘못된 요청입니다.');
+      }
       case 422: {
         return (this.message = '요청 내용이 올바르지 않습니다.');
       }
