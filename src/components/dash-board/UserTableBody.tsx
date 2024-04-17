@@ -3,7 +3,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { cls } from '@/utils/cls';
 import Modal from '../Modal';
 import UserEditModal from './modal/UserEditModal';
 import CheckBox from './CheckBox';
@@ -64,7 +63,7 @@ export default function UserTableBody({ userList }: Props) {
                 <td>
                   <CheckBox onClick={(e) => onCheck(e, user.id)} />
                 </td>
-                <td>{purchase.id}</td>
+                <td className="p-6">{purchase.id}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.phone}</td>

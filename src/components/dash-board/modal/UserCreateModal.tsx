@@ -157,11 +157,15 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
           <div className="mb-6">
             <UserEditPhoneInput
-              errorMessage=""
+              errorMessage={errors.phone?.message || errors.phoneType?.message || ''}
               phoneRegister={register('phone', {
                 required: {
                   message: '휴대폰 번호를 입력해주세요.',
                   value: true,
+                },
+                minLength: {
+                  message: '최소 7자리 이상입력해주세요.',
+                  value: 7,
                 },
               })}
               phoneTypeRegister={register('phoneType', {

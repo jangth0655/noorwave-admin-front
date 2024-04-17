@@ -21,7 +21,7 @@ export default function UserEditPhoneInput({
   };
   return (
     <div>
-      <div>
+      <div className="flex items-center gap-2">
         <label htmlFor="phone">휴대폰 번호</label>
         <ErrorMessage text={errorMessage} />
       </div>

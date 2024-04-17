@@ -10,6 +10,7 @@ import UserTableBody from './UserTableBody';
 import Modal from '../Modal';
 import ErrorModal from './modal/ErrorModal';
 import { ServerError } from '@/services/httpClient';
+import Loading from '../Loading';
 
 type Props = {
   keyword?: string;
@@ -67,19 +68,13 @@ export default function UserTableList({ keyword }: Props) {
             </tr>
           </tbody>
         ) : isPending ? (
-          Array.from({ length: 15 }).map((_, index) => (
-            <tbody key={index} className="bg-neutral-500 animate-pulse">
-              <tr className="rounded-xl overflow-hidden *:rounded-md">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          ))
+          <tbody>
+            <tr className="rounded-xl overflow-hidden *:rounded-md">
+              <td colSpan={7} className="text-center">
+                <Loading width={25} height={25} />
+              </td>
+            </tr>
+          </tbody>
         ) : (
           <UserTableBody userList={userList?.items} />
         )}
