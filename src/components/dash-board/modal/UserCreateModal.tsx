@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ko } from 'date-fns/locale/ko';
+import { useRouter } from 'next/navigation';
+import { formatYYYYMMDD } from '@/utils/formatDate';
+
+import { CreateUserArgs, createUser } from '@/services/users';
+import { ServerError } from '@/services/httpClient';
 
 import UserEditInput from '../UserEditInput';
 import UserModalWrapper from './UserModalWrapper';
 import Button from '@/components/Button';
-import UserDateInput from '../UserDateInput';
 import ErrorMessage from '../ErrorMessage';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ServerError } from '@/services/httpClient';
-import { CreateUserArgs, createUser } from '@/services/users';
 import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
@@ -20,9 +25,7 @@ type Props = {
 };
 
 export type DateForm = {
-  year?: string;
-  month?: string;
-  day?: string;
+  date?: Date;
   order?: number;
   quantity?: number;
   id: number;
@@ -36,6 +39,7 @@ export type UserDataForm = {
 };
 
 export default function UserCreateModal({ onCloseCreateModal }: Props) {
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -43,6 +47,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     formState: { errors },
     clearErrors,
     setValue,
+    control,
   } = useForm<UserDataForm>();
 
   const [dates, setDates] = useState<DateForm[]>([]);
@@ -60,22 +65,20 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       onCloseCreateModal();
     },
+    onError: (error) => {
+      const { statusCode } = error;
+      if (statusCode === 401 || statusCode === 422) {
+        router.replace('/');
+      }
+    },
   });
 
   const isNotDates = dates.length <= 0;
 
   const onAddDateInput = () => {
     clearErrors('date');
-    setDates([
-      ...dates,
-      {
-        year: undefined,
-        month: undefined,
-        day: undefined,
-        id: dateId,
-      },
-    ]);
-    setDateId((prev) => prev + 1);
+    setDates((prev) => [...prev, { id: dateId, date: undefined }]);
+    setDateId(dateId + 1);
   };
 
   const onSubmit = (data: UserDataForm) => {
@@ -87,13 +90,13 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       });
       return;
     }
-    if (!email || !name || !phone) return;
+
     const filteredDates = date
-      .filter(({ year, month, day }) => year && month && day)
+      .filter(({ date, order }) => date && order)
       .map((item) => ({
         purchase_order: item.order,
         quantity: item.quantity,
-        purchase_date: `${item.year}-${item.month}-${item.day}`,
+        purchase_date: formatYYYYMMDD(item.date),
       }));
 
     createMutate({
@@ -106,14 +109,13 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
   const onResetDateFields = (dateId: number) => {
     setValue(`date.${dateId}.order`, undefined);
-    setValue(`date.${dateId}.year`, undefined);
-    setValue(`date.${dateId}.month`, undefined);
-    setValue(`date.${dateId}.day`, undefined);
     setValue(`date.${dateId}.quantity`, undefined);
+    setValue(`date.${dateId}.date`, undefined);
   };
 
   const onRemoveDateField = (targetId: number) => {
     onResetDateFields(targetId);
+    clearErrors('date');
     const newDate = dates.filter((item) => item.id !== targetId);
     setDates(newDate);
   };
@@ -158,67 +160,90 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
               },
             })}
           />
-          <div>
-            <ul className="flex flex-col gap-2 overflow-y-scroll max-h-72">
-              {dates.map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <div className="flex items-center mr-2 gap-1">
-                    <input
-                      {...register(`date.${item.id}.order`, {
-                        required: true,
-                      })}
-                      type="text"
-                      className="w-8 border rounded-md text-center"
-                    />
-                    <span>차</span>
-                  </div>
-                  <UserDateInput register={register} date={item} />
-                  <div>
-                    <input
-                      {...register(`date.${item.id}.quantity`, {
-                        required: true,
-                      })}
-                      type="text"
-                      className="w-fit border mr-1 rounded-md text-center placeholder:text-sm"
-                      placeholder="구매 수량"
-                    />
-                  </div>
 
-                  <div className="flex items-center gap-1 ml-1">
-                    <button
-                      onClick={() => onResetDateFields(item.id)}
-                      type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      초기화
-                    </button>
-                    <button
-                      onClick={() => onRemoveDateField(item.id)}
-                      type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      제거
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className={isNotDates ? '' : 'mt-3'}>
-              <Button
-                onClick={onAddDateInput}
-                type="button"
-                text="구매이력 추가"
-                width={100}
-                height={40}
-                fontSize={14}
-              />
-              {errors.date?.message && <ErrorMessage text={errors.date?.message} marginTop={4} />}
-            </div>
+          <ul className="flex flex-col gap-4 relative">
+            {dates.map((date) => (
+              <li key={date.id} className="flex items-center justify-between">
+                <select
+                  {...register(`date.${date.id}.order`, {
+                    required: {
+                      message: '차수를 선택해주세요.',
+                      value: true,
+                    },
+                  })}
+                  className="max-w-xs mr-2 border p-1 rounded-xl outline-none text-sm"
+                >
+                  <option value={''}>차수</option>
+                  <option value={1}>1차</option>
+                  <option value={2}>2차</option>
+                  <option value={3}>3차</option>
+                </select>
+                <Controller
+                  key={date.id}
+                  name={`date.${date.id}.date`}
+                  rules={{ required: true }}
+                  control={control}
+                  render={({ field }) => {
+                    return (
+                      <ReactDatePicker
+                        locale={ko}
+                        showIcon
+                        shouldCloseOnSelect
+                        selected={field.value}
+                        onChange={(date) => field.onChange(date)}
+                        dateFormat="yyyy-MM-dd"
+                      />
+                    );
+                  }}
+                />
+                <div>
+                  <input
+                    {...register(`date.${date.id}.quantity`, {
+                      required: {
+                        message: '수량을 입력해주세요.',
+                        value: true,
+                      },
+                    })}
+                    type="number"
+                    placeholder="구매수량"
+                    className="border rounded-md px-2 placeholder:text-sm outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 ml-1">
+                  <button
+                    onClick={() => onResetDateFields(date.id)}
+                    type="button"
+                    className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                  >
+                    초기화
+                  </button>
+                  <button
+                    onClick={() => onRemoveDateField(date.id)}
+                    type="button"
+                    className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                  >
+                    제거
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="my-4 flex items-center gap-2">
+            <Button onClick={onAddDateInput} type="button" text="구매이력 추가" width={100} height={40} fontSize={14} />
+            {errors.date && errors.date.length !== 0 && (
+              <div>
+                <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
+              </div>
+            )}
           </div>
+
           <div className="flex items-center justify-center gap-6">
             <Button type="submit" text="저장" width={80} height={40} />
             <Button onClick={onCloseCreateModal} type="button" text="취소" width={80} height={40} />
           </div>
+
           {createError?.statusCode === 422 && (
             <div className="mt-4">
               <ErrorMessage text="올바른 입력 값이 아닙니다." />
@@ -233,7 +258,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
         )}
       </UserModalWrapper>
 
-      {isError && (
+      {isError && createError.errorMessage && (
         <Modal>
           <div>
             <ErrorModal errorMessage={createError.errorMessage} onCloseModal={onCloseCreateModal} />

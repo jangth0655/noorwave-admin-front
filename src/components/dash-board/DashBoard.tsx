@@ -83,10 +83,10 @@ export default function DashBoard() {
         </Modal>
       )}
 
-      {isErrorModal && (
+      {isErrorModal && error?.errorMessage && (
         <Modal>
           <div>
-            <ErrorModal errorMessage={'error?.errorMessage'} onCloseModal={() => setIsErrorModal(false)} />
+            <ErrorModal errorMessage={error?.errorMessage} onCloseModal={() => setIsErrorModal(false)} />
           </div>
         </Modal>
       )}

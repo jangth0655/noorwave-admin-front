@@ -1,22 +1,17 @@
-"use client";
+'use client';
 
-import { UserInfo } from "@/services/users";
-import { FormProvider, useForm } from "react-hook-form";
-import UserEditInput from "../UserEditInput";
+import { UserInfo } from '@/services/users';
+import { useForm } from 'react-hook-form';
 
-import UserDateInput from "../UserDateInput";
-import { stringDateSplit } from "@/utils/formatDate";
-import { UserDataForm } from "./UserCreateModal";
+import UserEditInput from '../UserEditInput';
+import { UserDataForm } from './UserCreateModal';
 
 type Props = {
   userDetail: UserInfo;
   onCloseDetailModal: () => void;
 };
 
-export default function UserDetailModal({
-  userDetail,
-  onCloseDetailModal,
-}: Props) {
+export default function UserDetailModal({ userDetail, onCloseDetailModal }: Props) {
   const { handleSubmit, register } = useForm<UserDataForm>();
 
   const onSubmit = (data: UserDataForm) => {
@@ -28,29 +23,14 @@ export default function UserDetailModal({
       <h1 className="mb-10 text-xl font-semibold">회원 정보 수정</h1>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <UserEditInput
-          htmlFor={"name"}
-          labelText="이름"
-          register={register("name")}
-        />
-        <UserEditInput
-          htmlFor={"email"}
-          labelText="이메일 주소"
-          register={register("email")}
-        />
-        <UserEditInput
-          htmlFor={"phone"}
-          labelText="휴대폰 번호"
-          register={register("phone")}
-        />
+        <UserEditInput htmlFor={'name'} labelText="이름" register={register('name')} />
+        <UserEditInput htmlFor={'email'} labelText="이메일 주소" register={register('email')} />
+        <UserEditInput htmlFor={'phone'} labelText="휴대폰 번호" register={register('phone')} />
 
         <div>
           <ul className="overflow-y-scroll max-h-96">
             {userDetail.purchases.map((item) => (
-              <li
-                key={item.id}
-                className="flex items-center relative justify-between mb-4"
-              >
+              <li key={item.id} className="flex items-center relative justify-between mb-4">
                 <span className="w-12 text-center block bg-slate-600 text-white py-1 rounded-md">
                   {item.purchase_order}
                 </span>
