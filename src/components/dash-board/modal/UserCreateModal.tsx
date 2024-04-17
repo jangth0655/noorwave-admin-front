@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import ReactDatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { ko } from 'date-fns/locale/ko';
+
 import { useRouter } from 'next/navigation';
 import { formatYYYYMMDD } from '@/utils/formatDate';
 
@@ -19,6 +17,8 @@ import ErrorMessage from '../ErrorMessage';
 import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
+import UserCalendarInput from '../UserCalendarInput';
+import OrderSelector from '../OrderSelector';
 
 type Props = {
   onCloseCreateModal: () => void;
@@ -164,37 +164,20 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           <ul className="flex flex-col gap-4 relative">
             {dates.map((date) => (
               <li key={date.id} className="flex items-center justify-between">
-                <select
-                  {...register(`date.${date.id}.order`, {
+                <OrderSelector
+                  register={register(`date.${date.id}.order`, {
                     required: {
                       message: '차수를 선택해주세요.',
                       value: true,
                     },
                   })}
-                  className="max-w-xs mr-2 border p-1 rounded-xl outline-none text-sm"
-                >
-                  <option value={''}>차수</option>
-                  <option value={1}>1차</option>
-                  <option value={2}>2차</option>
-                  <option value={3}>3차</option>
-                </select>
+                />
                 <Controller
                   key={date.id}
                   name={`date.${date.id}.date`}
                   rules={{ required: true }}
                   control={control}
-                  render={({ field }) => {
-                    return (
-                      <ReactDatePicker
-                        locale={ko}
-                        showIcon
-                        shouldCloseOnSelect
-                        selected={field.value}
-                        onChange={(date) => field.onChange(date)}
-                        dateFormat="yyyy-MM-dd"
-                      />
-                    );
-                  }}
+                  render={({ field }) => <UserCalendarInput field={field} />}
                 />
                 <div>
                   <input
@@ -206,7 +189,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
                     })}
                     type="number"
                     placeholder="구매수량"
-                    className="border rounded-md px-2 placeholder:text-sm outline-none"
+                    className="border rounded-md px-2 placeholder:text-sm outline-none py-1"
                   />
                 </div>
 
