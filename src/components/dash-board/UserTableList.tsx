@@ -11,6 +11,7 @@ import Modal from '../Modal';
 import ErrorModal from './modal/ErrorModal';
 import { ServerError } from '@/services/httpClient';
 import Loading from '../Loading';
+import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
   keyword?: string;
@@ -39,12 +40,16 @@ export default function UserTableList({ keyword }: Props) {
   }, [keyword, queryClient]);
 
   useEffect(() => {
+    if (error?.statusCode === 401) {
+      removeCookie();
+    }
+
     if (isError) {
       setIsErrorModal(true);
     } else {
       setIsErrorModal(false);
     }
-  }, [isError]);
+  }, [error?.statusCode, isError]);
 
   const onCLoseModal = () => {
     setIsErrorModal(false);
@@ -59,7 +64,7 @@ export default function UserTableList({ keyword }: Props) {
     <div className="overflow-x-auto">
       <table className="table">
         <TableHead headList={tableHead} />
-        {userList?.items.length === 0 ? (
+        {userList?.items?.length === 0 ? (
           <tbody>
             <tr>
               <td colSpan={7} className="bg-slate-100 text-center">

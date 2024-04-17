@@ -8,6 +8,7 @@ export const getUsers = async (search?: string) => {
       },
     })
   ).data;
+
   return response;
 };
 

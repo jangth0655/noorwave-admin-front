@@ -20,6 +20,7 @@ import ErrorModal from './ErrorModal';
 import UserCalendarInput from '../UserCalendarInput';
 import OrderSelector from '../OrderSelector';
 import UserEditPhoneInput from '../UserEditPhoneInput';
+import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
   onCloseCreateModal: () => void;
@@ -67,6 +68,11 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       onCloseCreateModal();
+    },
+    onError: (error) => {
+      if (error.statusCode === 401) {
+        removeCookie();
+      }
     },
   });
 

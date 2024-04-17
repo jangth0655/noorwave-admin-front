@@ -28,7 +28,7 @@ export default function UserSearchForm({ keyword, onKeyword }: Props) {
         onChange={onChange}
         type="text"
         placeholder="이름/이메일/전화번호"
-        className="border outline-none p-1 rounded-xl ring focus:ring-offset-1 ring-transparent focus:ring-gray-600 transition-shadow placeholder:text-sm px-2"
+        className="border outline-none p-1.5 rounded-xl ring focus:ring-offset-1 ring-transparent focus:ring-gray-600 transition-shadow placeholder:text-sm px-2"
       />
       <Button type="submit" width={80} height={40} text="검색" />
     </form>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -14,6 +14,7 @@ import { UserEditResult, deleteUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 import Loading from '../Loading';
 import ErrorModal from './modal/ErrorModal';
+import { removeCookie } from '@/utils/cookieManage';
 
 export default function DashBoard() {
   const router = useRouter();
@@ -34,8 +35,11 @@ export default function DashBoard() {
         queryKey: ['users'],
       });
     },
-    onError: () => {
+    onError: (error) => {
       setIsErrorModal(true);
+      if (error.statusCode === 401) {
+        removeCookie();
+      }
     },
   });
 

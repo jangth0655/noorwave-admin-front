@@ -19,6 +19,7 @@ import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
 import Loading from '@/components/Loading';
 import UserEditPhoneInput from '../UserEditPhoneInput';
+import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
   userDetail: UserInfo;
@@ -49,6 +50,11 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
         queryKey: ['users'],
       });
       onCloseDetailModal();
+    },
+    onError: (error) => {
+      if (error.statusCode === 401) {
+        removeCookie();
+      }
     },
   });
 
