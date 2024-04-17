@@ -19,6 +19,7 @@ import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
 import UserCalendarInput from '../UserCalendarInput';
 import OrderSelector from '../OrderSelector';
+import UserEditPhoneInput from '../UserEditPhoneInput';
 
 type Props = {
   onCloseCreateModal: () => void;
@@ -35,6 +36,7 @@ export type UserDataForm = {
   name: string;
   email: string;
   phone: string;
+  phoneType: string;
   date: DateForm[];
 };
 
@@ -52,6 +54,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
   const [dates, setDates] = useState<DateForm[]>([]);
   const [dateId, setDateId] = useState(0);
+
   const queryClient = useQueryClient();
   const {
     mutate: createMutate,
@@ -61,15 +64,9 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
   } = useMutation<{ message: string }, ServerError, AddAndEditUserArgs>({
     mutationKey: ['create-user'],
     mutationFn: createUser,
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       onCloseCreateModal();
-    },
-    onError: (error) => {
-      const { statusCode } = error;
-      if (statusCode === 401 || statusCode === 422) {
-        router.replace('/');
-      }
     },
   });
 
@@ -82,7 +79,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
   };
 
   const onSubmit = (data: UserDataForm) => {
-    const { date, email, name, phone } = data;
+    const { date, email, name, phone, phoneType } = data;
 
     if (isNotDates) {
       setError('date', {
@@ -100,10 +97,12 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
         purchase_date: formatYYYYMMDD(item.date),
       }));
 
+    const phoneNumber = phoneType + phone.substring(1);
+
     createMutate({
       email,
       name,
-      phone: `+82${phone}`,
+      phone: phoneNumber,
       purchases: filteredDates,
     });
   };
@@ -119,6 +118,11 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     clearErrors('date');
     const newDate = dates.filter((item) => item.id !== targetId);
     setDates(newDate);
+  };
+
+  const onCloseModalAndOnHome = () => {
+    onCloseCreateModal();
+    router.replace('/');
   };
 
   return (
@@ -150,17 +154,24 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
               },
             })}
           />
-          <UserEditInput
-            errorText={errors.phone?.message}
-            htmlFor={'phone'}
-            labelText="휴대폰 번호"
-            register={register('phone', {
-              required: {
-                value: true,
-                message: '휴대폰 번호을 입력해주세요.',
-              },
-            })}
-          />
+
+          <div className="mb-6">
+            <UserEditPhoneInput
+              errorMessage=""
+              phoneRegister={register('phone', {
+                required: {
+                  message: '휴대폰 번호를 입력해주세요.',
+                  value: true,
+                },
+              })}
+              phoneTypeRegister={register('phoneType', {
+                required: {
+                  message: '국가 번호를 선택해주세요.',
+                  value: true,
+                },
+              })}
+            />
+          </div>
 
           <ul className="flex flex-col gap-4 relative">
             {dates.length !== 0 &&
@@ -246,7 +257,14 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       {isError && createError.errorMessage && (
         <Modal>
           <div>
-            <ErrorModal errorMessage={createError.errorMessage} onCloseModal={onCloseCreateModal} />
+            <ErrorModal
+              errorMessage={createError.errorMessage}
+              onCloseModal={
+                createError.statusCode === 401 || createError.statusCode === 422
+                  ? onCloseModalAndOnHome
+                  : onCloseCreateModal
+              }
+            />
           </div>
         </Modal>
       )}

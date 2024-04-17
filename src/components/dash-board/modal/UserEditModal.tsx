@@ -1,8 +1,11 @@
 'use client';
 
-import { AddAndEditUserArgs, UserEditResult, UserInfo, updateUser } from '@/services/users';
+import { useRouter } from 'next/navigation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import dayjs from 'dayjs';
+
+import { AddAndEditUserArgs, UserEditResult, UserInfo, updateUser } from '@/services/users';
 
 import { formatYYYYMMDD } from '@/utils/formatDate';
 import UserEditInput from '../UserEditInput';
@@ -11,11 +14,11 @@ import UserCalendarInput from '../UserCalendarInput';
 import OrderSelector from '../OrderSelector';
 import Button from '@/components/Button';
 import ErrorMessage from '../ErrorMessage';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ServerError } from '@/services/httpClient';
 import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
 import Loading from '@/components/Loading';
+import UserEditPhoneInput from '../UserEditPhoneInput';
 
 type Props = {
   userDetail: UserInfo;
@@ -23,6 +26,7 @@ type Props = {
 };
 
 export default function UserEditModal({ userDetail, onCloseDetailModal }: Props) {
+  const router = useRouter();
   const {
     setValue,
     handleSubmit,
@@ -49,7 +53,7 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
   });
 
   const onSubmit = (data: UserDataForm) => {
-    const { date, email, name, phone } = data;
+    const { date, email, name, phone, phoneType } = data;
     const filteredDates = date
       .filter(({ date, order }) => date && order)
       .map((item, index) => {
@@ -62,10 +66,12 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
         };
       });
 
+    const phoneNumber = phoneType + phone.substring(1);
+
     updateUserMutate({
       email,
       name,
-      phone: phone.replace(/-|\s/g, ''),
+      phone: phoneNumber,
       purchases: filteredDates,
       userId: userDetail.id,
     });
@@ -76,6 +82,11 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
     setValue(`date.${dateIndex}.quantity`, userDetail.purchases[dateIndex].quantity);
     setValue(`date.${dateIndex}.date`, dayjs(userDetail.purchases[dateIndex].purchase_date).toDate());
     clearErrors('date');
+  };
+
+  const onCloseModalAndOnHome = () => {
+    onCloseDetailModal();
+    router.replace('/');
   };
 
   return (
@@ -91,15 +102,27 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
             register={register('email')}
             defaultValue={userDetail.email}
           />
-          <UserEditInput
-            htmlFor={'phone'}
-            labelText="휴대폰 번호"
-            register={register('phone')}
-            defaultValue={userDetail.phone}
-          />
+          <div className="mb-6">
+            <UserEditPhoneInput
+              errorMessage=""
+              phoneRegister={register('phone', {
+                required: {
+                  message: '휴대폰 번호를 입력해주세요.',
+                  value: true,
+                },
+              })}
+              phoneTypeRegister={register('phoneType', {
+                required: {
+                  message: '국가 번호를 선택해주세요.',
+                  value: true,
+                },
+              })}
+              phoneDefaultValue={userDetail.phone}
+            />
+          </div>
 
           <div>
-            <ul className="">
+            <ul>
               {userDetail.purchases &&
                 userDetail.purchases.length !== 0 &&
                 userDetail.purchases.map((item, index) => (
@@ -168,7 +191,12 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
       {isError && error.errorMessage && (
         <Modal>
           <div>
-            <ErrorModal errorMessage={error.errorMessage} onCloseModal={onCloseDetailModal} />
+            <ErrorModal
+              errorMessage={error.errorMessage}
+              onCloseModal={
+                error.statusCode === 401 || error.statusCode === 422 ? onCloseModalAndOnHome : onCloseDetailModal
+              }
+            />
           </div>
         </Modal>
       )}
