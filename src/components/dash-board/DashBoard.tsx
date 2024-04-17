@@ -13,8 +13,10 @@ import { UserEditResult, deleteUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 import Loading from '../Loading';
 import ErrorModal from './modal/ErrorModal';
+import { useRouter } from 'next/navigation';
 
 export default function DashBoard() {
+  const router = useRouter();
   const [isCreateModal, setIsCreateModal] = useState(false);
   const [isErrorModal, setIsErrorModal] = useState(false);
   const queryClient = useQueryClient();
@@ -42,6 +44,15 @@ export default function DashBoard() {
 
   const onCloseCreateModal = () => {
     setIsCreateModal(false);
+  };
+
+  const onCloseErrorModal = () => {
+    setIsErrorModal(false);
+  };
+
+  const onCloseErrorModalAndLogin = () => {
+    onCloseErrorModal();
+    router.replace('/');
   };
 
   const onDeleteUser = () => {
@@ -86,7 +97,12 @@ export default function DashBoard() {
       {isErrorModal && error?.errorMessage && (
         <Modal>
           <div>
-            <ErrorModal errorMessage={error?.errorMessage} onCloseModal={() => setIsErrorModal(false)} />
+            <ErrorModal
+              errorMessage={error?.errorMessage}
+              onCloseModal={
+                error.statusCode === 401 || error.statusCode === 422 ? onCloseErrorModalAndLogin : onCloseErrorModal
+              }
+            />
           </div>
         </Modal>
       )}

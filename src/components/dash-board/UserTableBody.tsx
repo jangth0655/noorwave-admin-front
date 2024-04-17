@@ -9,7 +9,6 @@ import UserEditModal from './modal/UserEditModal';
 import CheckBox from './CheckBox';
 
 import { UserInfo, UserPurchase } from '@/services/users';
-import dayjs from 'dayjs';
 
 type Props = {
   userList?: UserInfo[];
@@ -57,10 +56,8 @@ export default function UserTableBody({ userList }: Props) {
             <tr
               onClick={(event) => onUserInfo(event, { info: user, purchase })}
               key={`user-${user.id}-purchase-${index}`}
-              className={cls(
-                clickedUser?.purchase.id === purchase.id ? 'bg-slate-700 text-white' : '',
-                'cursor-pointer transition-all hover *:text-center'
-              )}
+              tabIndex={0}
+              className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white"
             >
               <td>
                 <CheckBox onClick={(e) => onCheck(e, user.id)} />

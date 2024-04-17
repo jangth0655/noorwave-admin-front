@@ -1,23 +1,79 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getUsers } from '@/services/users';
+import { User, getUsers } from '@/services/users';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import TableHead from './TableHead';
 import UserTableBody from './UserTableBody';
+import Modal from '../Modal';
+import ErrorModal from './modal/ErrorModal';
+import { ServerError } from '@/services/httpClient';
 
 export default function UserTableList() {
-  const { data: userList, isPending: isLoading } = useQuery({
+  const router = useRouter();
+  const [isErrorModal, setIsErrorModal] = useState(false);
+  const {
+    data: userList,
+    isPending,
+    error,
+    isError,
+  } = useQuery<User, ServerError>({
     queryKey: ['users'],
     queryFn: getUsers,
   });
+
+  useEffect(() => {
+    if (isError) {
+      setIsErrorModal(true);
+    } else {
+      setIsErrorModal(false);
+    }
+  }, [isError]);
+
+  const onCLoseModal = () => {
+    setIsErrorModal(false);
+  };
+
+  const onCloseModalAndLogin = () => {
+    onCLoseModal();
+    router.replace('/');
+  };
 
   return (
     <div className="overflow-x-auto">
       <table className="table">
         <TableHead headList={tableHead} />
-        <UserTableBody userList={userList?.items} />
+        {isPending ? (
+          Array.from({ length: 15 }).map((_, index) => (
+            <tbody key={index} className="bg-neutral-500 animate-pulse">
+              <tr className="rounded-xl overflow-hidden *:rounded-md">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          ))
+        ) : (
+          <UserTableBody userList={userList?.items} />
+        )}
       </table>
+
+      {error && isErrorModal && isError && (
+        <Modal>
+          <div>
+            <ErrorModal
+              errorMessage={error?.errorMessage}
+              onCloseModal={error.statusCode === 401 || error.statusCode === 422 ? onCloseModalAndLogin : onCLoseModal}
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
