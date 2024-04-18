@@ -20,6 +20,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <QueryProvider>
           <main className="text-slate-900">{children}</main>
+          <div id="modal"></div>
         </QueryProvider>
       </body>
     </html>
