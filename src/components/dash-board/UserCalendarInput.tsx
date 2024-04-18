@@ -1,9 +1,9 @@
 import ReactDatePicker from 'react-datepicker';
 import { ko } from 'date-fns/locale/ko';
 import { ControllerRenderProps } from 'react-hook-form';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { UserDataForm } from './modal/UserCreateModal';
-import 'react-datepicker/dist/react-datepicker.css';
 
 type Props = {
   field: ControllerRenderProps<UserDataForm, `date.${number}.date`>;

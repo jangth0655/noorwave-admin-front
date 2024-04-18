@@ -72,20 +72,17 @@ export default function DashBoard() {
 
   return (
     <>
-      <div>
+      <div className="mb-10">
         <h2 className="text-xl font-semibold mb-5">회원 리스트</h2>
         <div className="flex justify-between items-center mb-6">
-          <UserSearchForm keyword={keyword} onKeyword={onKeyword} />
-
+          <UserSearchForm onKeyword={onKeyword} />
           <div className="flex items-center gap-6">
             <Button onClick={onCreateModal} text="추가" width={80} height={40} />
             <Button onClick={onDeleteUser} text="선택 삭제" width={80} height={40} />
           </div>
         </div>
-        <div>
-          <UserTableList keyword={keyword} />
-        </div>
       </div>
+      <UserTableList keyword={keyword} />
 
       {isCreateModal && (
         <Modal>

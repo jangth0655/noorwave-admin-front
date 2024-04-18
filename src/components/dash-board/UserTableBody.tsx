@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import Modal from '../Modal';
 import UserEditModal from './modal/UserEditModal';
-import CheckBox from './CheckBox';
+import CheckBox from '../CheckBox';
 
 import { UserInfo, UserPurchase } from '@/services/users';
 import { formatToWon } from '@/utils/formatToCurrency';

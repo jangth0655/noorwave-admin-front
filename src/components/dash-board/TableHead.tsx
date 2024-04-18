@@ -10,7 +10,7 @@ type Props = {
 export default function TableHead({ headList }: Props) {
   return (
     <thead>
-      <tr>
+      <tr className="bg-slate-500 text-white">
         {headList.map((item) => (
           <th className="text-center" key={item.key}>
             {item.name}

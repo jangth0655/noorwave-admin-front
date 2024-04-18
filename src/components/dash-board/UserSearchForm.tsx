@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+
 import Button from '../Button';
 
 type Props = {
   onKeyword: (word: string) => void;
-  keyword?: string;
 };
 
-export default function UserSearchForm({ keyword, onKeyword }: Props) {
+export default function UserSearchForm({ onKeyword }: Props) {
   const [value, setValue] = useState('');
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

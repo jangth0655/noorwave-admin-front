@@ -9,7 +9,7 @@ type Props = {
   errorMessage: string;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-export default function UserEditPhoneInput({
+export default function DashboardPhoneInput({
   errorMessage,
   phoneRegister,
   phoneTypeRegister,

@@ -10,7 +10,7 @@ import { formatYYYYMMDD } from '@/utils/formatDate';
 import { AddAndEditUserArgs, createUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 
-import UserEditInput from '../UserEditInput';
+import DashboardInput from '../DashboardInput';
 import UserModalWrapper from './UserModalWrapper';
 import Button from '@/components/Button';
 import ErrorMessage from '../ErrorMessage';
@@ -18,8 +18,8 @@ import Loading from '@/components/Loading';
 import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
 import UserCalendarInput from '../UserCalendarInput';
-import OrderSelector from '../OrderSelector';
-import UserEditPhoneInput from '../UserEditPhoneInput';
+import DashboardOrderSelector from '../DashboardOrderSelector';
+import DashboardPhoneInput from '../DashboardPhoneInput';
 import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
@@ -136,33 +136,33 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       <UserModalWrapper>
         <h1 className="mb-10 text-xl font-semibold">회원 정보 등록</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <UserEditInput
-            errorText={errors.name?.message}
-            htmlFor={'name'}
-            labelText="이름"
-            type="text"
-            register={register('name', {
-              required: {
-                value: true,
-                message: '이름을 입력해주세요.',
-              },
-            })}
-          />
+          <div className="flex flex-col gap-4 mb-6">
+            <DashboardInput
+              errorText={errors.name?.message}
+              htmlFor={'name'}
+              labelText="이름"
+              type="text"
+              register={register('name', {
+                required: {
+                  value: true,
+                  message: '이름을 입력해주세요.',
+                },
+              })}
+            />
 
-          <UserEditInput
-            errorText={errors.email?.message}
-            htmlFor={'email'}
-            labelText="이메일 주소"
-            register={register('email', {
-              required: {
-                value: true,
-                message: '이메일을 입력해주세요.',
-              },
-            })}
-          />
+            <DashboardInput
+              errorText={errors.email?.message}
+              htmlFor={'email'}
+              labelText="이메일 주소"
+              register={register('email', {
+                required: {
+                  value: true,
+                  message: '이메일을 입력해주세요.',
+                },
+              })}
+            />
 
-          <div className="mb-6">
-            <UserEditPhoneInput
+            <DashboardPhoneInput
               errorMessage={errors.phone?.message || errors.phoneType?.message || ''}
               phoneRegister={register('phone', {
                 required: {
@@ -187,7 +187,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
             {dates.length !== 0 &&
               dates.map((date) => (
                 <li key={date.id} className="flex items-center justify-between">
-                  <OrderSelector
+                  <DashboardOrderSelector
                     register={register(`date.${date.id as number}.order`, {
                       required: {
                         message: '차수를 선택해주세요.',
@@ -202,19 +202,17 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
                     control={control}
                     render={({ field }) => <UserCalendarInput field={field} />}
                   />
-                  <div>
-                    <input
-                      {...register(`date.${date.id as number}.quantity`, {
-                        required: {
-                          message: '구매 수량을 입력해주세요.',
-                          value: true,
-                        },
-                      })}
-                      type="number"
-                      placeholder="구매수량"
-                      className="border rounded-md px-2 placeholder:text-sm outline-none py-1"
-                    />
-                  </div>
+
+                  <DashboardInput
+                    register={register(`date.${date.id as number}.quantity`, {
+                      required: {
+                        message: '구매 수량을 입력해주세요.',
+                        value: true,
+                      },
+                    })}
+                    type="number"
+                    placeholder="구매수량"
+                  />
 
                   <div className="flex items-center gap-2 ml-1">
                     <button

@@ -8,17 +8,17 @@ import dayjs from 'dayjs';
 import { AddAndEditUserArgs, UserEditResult, UserInfo, updateUser } from '@/services/users';
 
 import { formatYYYYMMDD } from '@/utils/formatDate';
-import UserEditInput from '../UserEditInput';
+import DashboardInput from '../DashboardInput';
 import { UserDataForm } from './UserCreateModal';
 import UserCalendarInput from '../UserCalendarInput';
-import OrderSelector from '../OrderSelector';
+import DashboardOrderSelector from '../DashboardOrderSelector';
 import Button from '@/components/Button';
 import ErrorMessage from '../ErrorMessage';
 import { ServerError } from '@/services/httpClient';
 import Modal from '@/components/Modal';
 import ErrorModal from './ErrorModal';
 import Loading from '@/components/Loading';
-import UserEditPhoneInput from '../UserEditPhoneInput';
+import DashboardPhoneInput from '../DashboardPhoneInput';
 import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
@@ -101,15 +101,21 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
         <h1 className="mb-10 text-xl font-semibold">회원 정보 수정</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <UserEditInput htmlFor={'name'} labelText="이름" register={register('name')} defaultValue={userDetail.name} />
-          <UserEditInput
-            htmlFor={'email'}
-            labelText="이메일 주소"
-            register={register('email')}
-            defaultValue={userDetail.email}
-          />
-          <div className="mb-6">
-            <UserEditPhoneInput
+          <div className="flex flex-col gap-4 mb-6">
+            <DashboardInput
+              htmlFor={'name'}
+              labelText="이름"
+              register={register('name')}
+              defaultValue={userDetail.name}
+            />
+            <DashboardInput
+              htmlFor={'email'}
+              labelText="이메일 주소"
+              register={register('email')}
+              defaultValue={userDetail.email}
+            />
+
+            <DashboardPhoneInput
               errorMessage=""
               phoneRegister={register('phone', {
                 required: {
@@ -127,60 +133,57 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
             />
           </div>
 
-          <div>
-            <ul>
-              {userDetail.purchases &&
-                userDetail.purchases.length !== 0 &&
-                userDetail.purchases.map((item, index) => (
-                  <li key={item.id} className="flex items-center relative justify-between mb-2 last:mb-0">
-                    <OrderSelector
-                      register={register(`date.${index}.order`, {
-                        required: {
-                          message: '차수를 선택해주세요.',
-                          value: true,
-                        },
-                        valueAsNumber: true,
-                      })}
-                      defaultValue={item.purchase_order}
-                    />
-                    <div className="flex-2 py-1 px-2 rounded-md flex items-center">
-                      <Controller
-                        name={`date.${index}.date`}
-                        rules={{ required: true }}
-                        control={control}
-                        defaultValue={dayjs(item.purchase_date).toDate()}
-                        render={({ field }) => <UserCalendarInput field={field} />}
-                      />
-                    </div>
-                    <input
-                      defaultValue={item.quantity}
-                      {...register(`date.${index}.quantity`, {
-                        required: {
-                          message: '구매 수량을 입력해주세요.',
-                          value: true,
-                        },
-                        valueAsNumber: true,
-                      })}
-                      type="number"
-                      placeholder="구매수량"
-                      className="border rounded-md px-2 placeholder:text-sm outline-none py-1"
-                    />
-                    <button
-                      onClick={() => onResetDateFields(index)}
-                      type="button"
-                      className="py-1 bg-slate-200 rounded-md w-20 hover:bg-slate-400 hover:text-white transition-all"
-                    >
-                      초기화
-                    </button>
-                  </li>
-                ))}
-              {errors.date && errors.date.length !== 0 && (
-                <div>
-                  <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
-                </div>
-              )}
-            </ul>
-          </div>
+          <ul>
+            {userDetail.purchases &&
+              userDetail.purchases.length !== 0 &&
+              userDetail.purchases.map((item, index) => (
+                <li key={item.id} className="flex items-center relative justify-between mb-2 last:mb-0">
+                  <DashboardOrderSelector
+                    register={register(`date.${index}.order`, {
+                      required: {
+                        message: '차수를 선택해주세요.',
+                        value: true,
+                      },
+                      valueAsNumber: true,
+                    })}
+                    defaultValue={item.purchase_order}
+                  />
+
+                  <Controller
+                    name={`date.${index}.date`}
+                    rules={{ required: true }}
+                    control={control}
+                    defaultValue={dayjs(item.purchase_date).toDate()}
+                    render={({ field }) => <UserCalendarInput field={field} />}
+                  />
+
+                  <DashboardInput
+                    defaultValue={item.quantity}
+                    register={register(`date.${index}.quantity`, {
+                      required: {
+                        message: '구매 수량을 입력해주세요.',
+                        value: true,
+                      },
+                      valueAsNumber: true,
+                    })}
+                    type="number"
+                    placeholder="구매수량"
+                  />
+                  <button
+                    onClick={() => onResetDateFields(index)}
+                    type="button"
+                    className="py-1 bg-slate-200 rounded-md w-20 hover:bg-slate-400 hover:text-white transition-all"
+                  >
+                    초기화
+                  </button>
+                </li>
+              ))}
+            {errors.date && errors.date.length !== 0 && (
+              <div>
+                <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
+              </div>
+            )}
+          </ul>
 
           <div className="flex items-center gap-2 justify-center mt-10">
             <Button type="button" text="취소" onClick={onCloseDetailModal} width={80} height={40} />

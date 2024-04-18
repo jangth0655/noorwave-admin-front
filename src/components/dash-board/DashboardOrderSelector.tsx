@@ -5,7 +5,7 @@ type Props = {
   defaultValue?: number;
 };
 
-export default function OrderSelector({ register, defaultValue }: Props) {
+export default function DashboardOrderSelector({ register, defaultValue }: Props) {
   return (
     <select
       defaultValue={defaultValue}
