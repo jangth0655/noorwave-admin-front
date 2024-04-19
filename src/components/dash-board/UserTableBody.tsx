@@ -58,9 +58,9 @@ export default function UserTableBody({ userList }: Props) {
                 onClick={(event) => onUserInfo(event, { info: user, purchase })}
                 key={`user-${user.id}-purchase-${index}`}
                 tabIndex={0}
-                className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white"
+                className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white pointer-events-none lg:pointer-events-auto *:whitespace-nowrap"
               >
-                <td>
+                <td className="hidden lg:flex">
                   <CheckBox onClick={(e) => onCheck(e, user.id)} />
                 </td>
                 <td className="p-6">{purchase.id}</td>

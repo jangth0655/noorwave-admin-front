@@ -1,3 +1,5 @@
+import { cls } from '@/utils/cls';
+
 export type TableHeadType = {
   name: string;
   key: string;
@@ -10,9 +12,9 @@ type Props = {
 export default function TableHead({ headList }: Props) {
   return (
     <thead>
-      <tr className="bg-slate-500 text-white">
+      <tr className="bg-slate-600 text-white">
         {headList.map((item) => (
-          <th className="text-center" key={item.key}>
+          <th className={cls(item.key === '' ? 'hidden lg:flex' : '', 'text-center')} key={item.key}>
             {item.name}
           </th>
         ))}
