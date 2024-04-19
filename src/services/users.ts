@@ -75,8 +75,8 @@ export type UserInfo = {
 };
 
 export type UserPurchase = {
-  id: number;
-  purchase_date: string;
-  purchase_order: number;
-  quantity: number;
+  id?: number;
+  purchase_date?: string;
+  purchase_order?: number;
+  quantity?: number;
 };
