@@ -1,4 +1,4 @@
-import { ForwardedRef, InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 import ErrorMessage from './ErrorMessage';
 import { cls } from '@/utils/cls';
