@@ -66,14 +66,14 @@ export default function UserTableList({ keyword }: Props) {
         {userList?.items?.length === 0 ? (
           <tbody>
             <tr>
-              <td colSpan={7} className="bg-slate-100 text-center">
+              <td colSpan={7} className="bg-slate-100 md:text-center">
                 검색 결과가 없습니다.
               </td>
             </tr>
           </tbody>
         ) : isPending ? (
           <tbody>
-            {Array.from({ length: 10 }).map((_, index) => (
+            {Array.from({ length: 15 }).map((_, index) => (
               <tr key={index} className="rounded-xl overflow-x-hidden *:rounded-md bg-slate-500 animate-pulse">
                 <td colSpan={7} className="p-5" />
               </tr>
