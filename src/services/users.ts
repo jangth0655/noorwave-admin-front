@@ -5,6 +5,7 @@ export const getUsers = async (search?: string) => {
     await api.get<Promise<User>>('/user', {
       params: {
         search,
+        sort: '-id',
       },
     })
   ).data;

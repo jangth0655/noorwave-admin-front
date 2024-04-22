@@ -53,7 +53,15 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     control,
   } = useForm<UserDataForm>();
 
-  const [dates, setDates] = useState<DateForm[]>([]);
+  const [dates, setDates] = useState<DateForm[]>([
+    {
+      id: 0,
+      date: undefined,
+      order: undefined,
+      quantity: undefined,
+    },
+  ]);
+
   const [dateId, setDateId] = useState(0);
 
   const queryClient = useQueryClient();
@@ -80,8 +88,8 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
   const onAddDateInput = () => {
     clearErrors('date');
-    setDates((prev) => [...prev, { id: dateId, date: undefined }]);
-    setDateId(dateId + 1);
+    setDateId((prev) => prev + 1);
+    setDates((prev) => [...prev, { id: dateId + 1, date: undefined }]);
   };
 
   const onSubmit = (data: UserDataForm) => {
@@ -185,7 +193,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
           <ul className="flex flex-col gap-4 relative">
             {dates.length !== 0 &&
-              dates.map((date) => (
+              dates.map((date, index) => (
                 <li key={date.id} className="flex items-center justify-between">
                   <DashboardOrderSelector
                     register={register(`date.${date.id as number}.order`, {
@@ -222,13 +230,15 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
                     >
                       초기화
                     </button>
-                    <button
-                      onClick={() => onRemoveDateField(date.id as number)}
-                      type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      제거
-                    </button>
+                    {index === 0 ? null : (
+                      <button
+                        onClick={() => onRemoveDateField(date.id as number)}
+                        type="button"
+                        className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                      >
+                        제거
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}
