@@ -60,15 +60,15 @@ export default function UserTableBody({ userList }: Props) {
                 tabIndex={0}
                 className="cursor-pointer transition-all hover *:text-center focus:bg-slate-700 focus:text-white pointer-events-none lg:pointer-events-auto *:whitespace-nowrap"
               >
-                <td className="hidden lg:flex">
+                <td className="hidden lg:block">
                   <CheckBox onClick={(e) => onCheck(e, user.id)} />
                 </td>
-                <td className="p-6">{purchase.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>{purchase.purchase_order}</td>
-                <td>{formatToWon(purchase.quantity as number)}</td>
+                <td className="">{purchase.id}</td>
+                <td className="">{user.name}</td>
+                <td className="">{user.email}</td>
+                <td className="">{user.phone}</td>
+                <td className="">{purchase.purchase_order}</td>
+                <td className="">{formatToWon(purchase.quantity as number)}</td>
               </tr>
             ))
           )}

@@ -74,11 +74,11 @@ export default function UserTableList({ keyword }: Props) {
           </tbody>
         ) : isPending ? (
           <tbody>
-            <tr className="rounded-xl overflow-hidden *:rounded-md">
-              <td colSpan={7} className="text-center">
-                <Loading width={25} height={25} />
-              </td>
-            </tr>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <tr key={index} className="rounded-xl overflow-x-hidden *:rounded-md bg-slate-500 animate-pulse">
+                <td colSpan={7} className="p-5" />
+              </tr>
+            ))}
           </tbody>
         ) : (
           <UserTableBody userList={userList?.items} />
@@ -102,7 +102,7 @@ export default function UserTableList({ keyword }: Props) {
 export const tableHead = [
   {
     name: '',
-    key: '',
+    key: 'check',
   },
   {
     name: 'ID',
