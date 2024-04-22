@@ -1,6 +1,5 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import Modal from '../Modal';
@@ -12,9 +11,11 @@ import { formatToWon } from '@/utils/formatToCurrency';
 
 type Props = {
   userList?: UserInfo[];
+  onSetCheckedUserId: (ids: number[]) => void;
+  checkedUserIds: number[];
 };
 
-export default function UserTableBody({ userList }: Props) {
+export default function UserTableBody({ userList, checkedUserIds, onSetCheckedUserId }: Props) {
   const [isModal, setIsModal] = useState(false);
   const [clickedUser, setClickedUser] = useState<UserInfo | undefined>();
 
@@ -28,19 +29,15 @@ export default function UserTableBody({ userList }: Props) {
     setIsModal(false);
   };
 
-  const queryClient = useQueryClient();
   const onCheck = (e: React.MouseEvent<HTMLElement>, userId: number) => {
     e.stopPropagation();
-    const currentCheckedIds = queryClient.getQueryData<number[]>(['checkedUserIds']) || [];
     let newCheckedIds;
-
-    if (currentCheckedIds.includes(userId)) {
-      newCheckedIds = currentCheckedIds.filter((id) => id !== userId);
+    if (checkedUserIds.includes(userId)) {
+      newCheckedIds = checkedUserIds.filter((id) => id !== userId);
     } else {
-      newCheckedIds = [...currentCheckedIds, userId];
+      newCheckedIds = [...checkedUserIds, userId];
     }
-
-    queryClient.setQueryData(['checkedUserIds'], newCheckedIds);
+    onSetCheckedUserId(newCheckedIds);
   };
 
   return (

@@ -21,6 +21,7 @@ export default function DashBoard() {
   const [isCreateModal, setIsCreateModal] = useState(false);
   const [isErrorModal, setIsErrorModal] = useState(false);
   const [keyword, setKeyword] = useState<string>();
+  const [checkedUserIds, setCheckedUserIds] = useState<number[]>([]);
   const queryClient = useQueryClient();
 
   const {
@@ -30,7 +31,8 @@ export default function DashBoard() {
   } = useMutation<UserEditResult, ServerError, number[]>({
     mutationFn: deleteUser,
     mutationKey: ['delete-user'],
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setCheckedUserIds([]);
       queryClient.invalidateQueries({
         queryKey: ['users'],
       });
@@ -42,6 +44,10 @@ export default function DashBoard() {
       }
     },
   });
+
+  const onSetCheckedUserId = (userIds: number[]) => {
+    setCheckedUserIds(userIds);
+  };
 
   const onCreateModal = () => {
     setIsCreateModal(true);
@@ -61,12 +67,11 @@ export default function DashBoard() {
   };
 
   const onDeleteUser = () => {
-    const checkedUsers = queryClient.getQueryData(['checkedUserIds']) as number[];
-    if (!checkedUsers || checkedUsers.length === 0) return;
-    deleteUserMutate(checkedUsers);
+    if (!checkedUserIds || checkedUserIds.length === 0) return;
+    deleteUserMutate(checkedUserIds);
   };
 
-  const onKeyword = (word: string) => {
+  const onKeyword = (word?: string) => {
     setKeyword(word);
   };
 
@@ -82,7 +87,7 @@ export default function DashBoard() {
           </div>
         </div>
       </div>
-      <UserTableList keyword={keyword} />
+      <UserTableList keyword={keyword} checkedUserIds={checkedUserIds} onSetCheckedUserId={onSetCheckedUserId} />
 
       {isCreateModal && (
         <Modal>
@@ -105,9 +110,7 @@ export default function DashBoard() {
           <div>
             <ErrorModal
               errorMessage={error?.errorMessage}
-              onCloseModal={
-                error.statusCode === 401 || error.statusCode === 422 ? onCloseErrorModalAndLogin : onCloseErrorModal
-              }
+              onCloseModal={error.statusCode === 401 ? onCloseErrorModalAndLogin : onCloseErrorModal}
             />
           </div>
         </Modal>

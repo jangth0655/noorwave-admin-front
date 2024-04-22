@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Button from '../Button';
 
 type Props = {
-  onKeyword: (word: string) => void;
+  onKeyword: (word?: string) => void;
 };
 
 export default function UserSearchForm({ onKeyword }: Props) {
@@ -15,6 +15,12 @@ export default function UserSearchForm({ onKeyword }: Props) {
     const newValue = e.target.value;
     setValue(newValue);
   };
+
+  useEffect(() => {
+    if (value === '') {
+      onKeyword();
+    }
+  }, [onKeyword, value]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

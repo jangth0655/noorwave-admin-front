@@ -277,11 +277,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           <div>
             <ErrorModal
               errorMessage={createError.errorMessage}
-              onCloseModal={
-                createError.statusCode === 401 || createError.statusCode === 422
-                  ? onCloseModalAndOnHome
-                  : onCloseCreateModal
-              }
+              onCloseModal={createError.statusCode === 401 ? onCloseModalAndOnHome : onCloseCreateModal}
             />
           </div>
         </Modal>
