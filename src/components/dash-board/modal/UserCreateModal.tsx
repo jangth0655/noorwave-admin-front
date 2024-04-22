@@ -195,34 +195,36 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
             {dates.length !== 0 &&
               dates.map((date, index) => (
                 <li key={date.id} className="flex items-center justify-between">
-                  <DashboardOrderSelector
-                    register={register(`date.${date.id as number}.order`, {
-                      required: {
-                        message: '차수를 선택해주세요.',
-                        value: true,
-                      },
-                    })}
-                  />
-                  <Controller
-                    key={date.id}
-                    name={`date.${date.id as number}.date`}
-                    rules={{ required: true }}
-                    control={control}
-                    render={({ field }) => <UserCalendarInput field={field} />}
-                  />
+                  <div className="flex items-center gap-1">
+                    <DashboardOrderSelector
+                      register={register(`date.${date.id as number}.order`, {
+                        required: {
+                          message: '차수를 선택해주세요.',
+                          value: true,
+                        },
+                      })}
+                    />
+                    <Controller
+                      key={date.id}
+                      name={`date.${date.id as number}.date`}
+                      rules={{ required: true }}
+                      control={control}
+                      render={({ field }) => <UserCalendarInput field={field} />}
+                    />
 
-                  <DashboardInput
-                    register={register(`date.${date.id as number}.quantity`, {
-                      required: {
-                        message: '구매 수량을 입력해주세요.',
-                        value: true,
-                      },
-                    })}
-                    type="number"
-                    placeholder="구매수량"
-                  />
+                    <DashboardInput
+                      register={register(`date.${date.id as number}.quantity`, {
+                        required: {
+                          message: '구매 수량을 입력해주세요.',
+                          value: true,
+                        },
+                      })}
+                      type="number"
+                      placeholder="구매수량"
+                    />
+                  </div>
 
-                  <div className="flex items-center gap-2 ml-1">
+                  <div className="flex items-center gap-2 ml-4 w-full">
                     <button
                       onClick={() => onResetDateFields(date.id as number)}
                       type="button"
