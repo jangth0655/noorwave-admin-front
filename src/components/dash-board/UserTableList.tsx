@@ -10,7 +10,6 @@ import UserTableBody from './UserTableBody';
 import Modal from '../Modal';
 import ErrorModal from './modal/ErrorModal';
 import { ServerError } from '@/services/httpClient';
-import Loading from '../Loading';
 import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
