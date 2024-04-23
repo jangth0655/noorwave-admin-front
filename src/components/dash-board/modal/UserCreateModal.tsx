@@ -36,6 +36,7 @@ export type UserDataForm = {
 };
 
 export default function UserCreateModal({ onCloseCreateModal }: Props) {
+  const [isExistUserErrorModal, setIsExistUserErrorModal] = useState(false);
   const router = useRouter();
   const {
     handleSubmit,
@@ -71,6 +72,9 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       onCloseCreateModal();
     },
     onError: (error) => {
+      if (error.statusCode === 400) {
+        setIsExistUserErrorModal(true);
+      }
       if (error.statusCode === 401) {
         removeCookie();
       }
@@ -277,18 +281,12 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
             <Button onClick={onAddDateInput} type="button" text="구매이력 추가" width={100} height={40} fontSize={14} />
             {errors.date && errors.date.length !== 0 && (
               <div>
-                <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
+                <ErrorMessage fontSize={14} text="구매이력을 올바르게 입력해주세요." />
               </div>
             )}
-            {(createError?.statusCode === 422 || createError?.statusCode === 400) && (
-              <div className="mt-4">
-                <ErrorMessage
-                  text={
-                    createError.statusCode === 422
-                      ? '올바른 입력 값이 아닙니다.'
-                      : '이메일 또는 휴대폰 번호가 이미 존재합니다.'
-                  }
-                />
+            {createError?.statusCode === 422 && (
+              <div>
+                <ErrorMessage fontSize={14} text="올바른 입력 값이 아닙니다." />
               </div>
             )}
           </div>
@@ -305,6 +303,15 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           </div>
         )}
       </UserModalWrapper>
+
+      {isExistUserErrorModal && (
+        <Modal>
+          <ErrorModal
+            errorMessage="이메일 또는 휴대폰 번호가 존재합니다."
+            onCloseModal={() => setIsExistUserErrorModal(false)}
+          />
+        </Modal>
+      )}
 
       {isError && isExtraError && createError.errorMessage && (
         <Modal>

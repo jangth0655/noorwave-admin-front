@@ -26,7 +26,7 @@ export default function DashboardInput({
       {labelText && (
         <div className="flex items-center gap-4 font-medium">
           <label htmlFor={htmlFor}>{labelText}</label>
-          <ErrorMessage text={errorText} />
+          <ErrorMessage text={errorText} fontSize={14} />
         </div>
       )}
       <input
