@@ -3,5 +3,5 @@ type Props = {
 };
 
 export default function UserModalWrapper({ children }: Props) {
-  return <div className="bg-white p-4 min-w-[640px] px-10 rounded-xl shadow-lg relative">{children}</div>;
+  return <div className="bg-white px-10 py-5 min-w-[640px]  rounded-xl shadow-lg relative">{children}</div>;
 }

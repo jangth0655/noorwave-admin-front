@@ -4,8 +4,6 @@ import { ACCESS_TOKEN } from '@/utils/cookieManage';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-type LoginData = { access_token: string; token_type: string };
-
 export async function cookieAction(prevState: any, formData: FormData) {
   const login_id = formData.get('email')?.toString();
   const password = formData.get('password')?.toString();
@@ -41,7 +39,7 @@ export async function cookieAction(prevState: any, formData: FormData) {
     if (data && data.access_token) {
       cookies().set(ACCESS_TOKEN, data.access_token);
       redirect('/dash-board');
-    } else if (data.detail[0].type === 'string_pattern_mismatch' || data.detail === 'Invalid Credentials') {
+    } else if (data.detail && data.detail.length > 0) {
       return {
         ok: false,
         error: '아이디 또는 패스워드가 올바르지 않습니다.',

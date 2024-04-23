@@ -209,68 +209,67 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           <ul className="flex flex-col gap-4 relative">
             {dates.length !== 0 &&
               dates.map((date, index) => (
-                <li key={date.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <DashboardOrderSelector
-                      register={register(`date.${date.id as number}.purchase_order`, {
-                        required: {
-                          message: '차수를 선택해주세요.',
-                          value: true,
-                        },
-                        onChange: (e) => {
-                          const value = e.target.value;
-                          onChangeUpdateDates(date.id!, 'purchase_order', value);
-                        },
-                      })}
-                    />
-                    <Controller
-                      key={date.id}
-                      name={`date.${date.id as number}.purchase_date`}
-                      rules={{
-                        required: true,
-                        onChange: (e) => {
-                          const value = e.target.value;
-                          onChangeUpdateDates(date.id!, 'purchase_date', value);
-                        },
-                      }}
-                      control={control}
-                      render={({ field }) => {
-                        return <UserCalendarInput field={field} />;
-                      }}
-                    />
+                <li key={date.id} className="flex items-center justify-between relative">
+                  <DashboardOrderSelector
+                    register={register(`date.${date.id as number}.purchase_order`, {
+                      required: {
+                        message: '차수를 선택해주세요.',
+                        value: true,
+                      },
+                      onChange: (e) => {
+                        const value = e.target.value;
+                        onChangeUpdateDates(date.id!, 'purchase_order', value);
+                      },
+                    })}
+                  />
+                  <Controller
+                    key={date.id}
+                    name={`date.${date.id as number}.purchase_date`}
+                    rules={{
+                      required: true,
+                      onChange: (e) => {
+                        const value = e.target.value;
+                        onChangeUpdateDates(date.id!, 'purchase_date', value);
+                      },
+                    }}
+                    control={control}
+                    render={({ field }) => {
+                      return <UserCalendarInput field={field} />;
+                    }}
+                  />
 
-                    <DashboardInput
-                      register={register(`date.${date.id as number}.quantity`, {
-                        required: {
-                          message: '구매 수량을 입력해주세요.',
-                          value: true,
-                        },
-                        onChange: (e) => {
-                          const value = e.target.value;
-                          onChangeUpdateDates(date.id!, 'quantity', value);
-                        },
-                      })}
-                      type="number"
-                      placeholder="구매수량"
-                    />
-                  </div>
+                  <DashboardInput
+                    register={register(`date.${date.id as number}.quantity`, {
+                      required: {
+                        message: '구매 수량을 입력해주세요.',
+                        value: true,
+                      },
+                      onChange: (e) => {
+                        const value = e.target.value;
+                        onChangeUpdateDates(date.id!, 'quantity', value);
+                      },
+                    })}
+                    type="number"
+                    placeholder="구매수량"
+                  />
 
                   <div className="flex items-center gap-2 ml-4 w-full">
-                    <button
+                    <Button
                       onClick={() => onResetDateFields(date.id as number)}
                       type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      초기화
-                    </button>
+                      text="초기화"
+                      fontSize={14}
+                      bgColor="#6b7280"
+                    />
+
                     {index === 0 ? null : (
-                      <button
+                      <Button
                         onClick={() => onRemoveDateField(date.id as number)}
                         type="button"
-                        className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                      >
-                        제거
-                      </button>
+                        text="제거"
+                        bgColor="#334155d9"
+                        fontSize={14}
+                      />
                     )}
                   </div>
                 </li>
@@ -278,7 +277,7 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           </ul>
 
           <div className="my-4 flex items-center gap-2">
-            <Button onClick={onAddDateInput} type="button" text="구매이력 추가" width={100} height={40} fontSize={14} />
+            <Button onClick={onAddDateInput} type="button" text="구매이력 추가" fontSize={14} />
             {errors.date && errors.date.length !== 0 && (
               <div>
                 <ErrorMessage fontSize={14} text="구매이력을 올바르게 입력해주세요." />
@@ -292,8 +291,8 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
           </div>
 
           <div className="flex items-center justify-center gap-6">
-            <Button type="submit" text="저장" width={80} height={40} />
-            <Button onClick={onCloseCreateModal} type="button" text="취소" width={80} height={40} />
+            <Button type="submit" text="저장" />
+            <Button onClick={onCloseCreateModal} type="button" text="취소" />
           </div>
         </form>
         {isCreateLoading && (

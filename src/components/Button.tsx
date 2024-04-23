@@ -2,22 +2,19 @@ import { ButtonHTMLAttributes } from 'react';
 
 type Props = {
   text: string;
-  width: number;
-  height: number;
   fontSize?: number;
   bgColor?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function Button({ text, width, height, bgColor, fontSize, ...rest }: Props) {
+export default function Button({ text, bgColor, fontSize, ...rest }: Props) {
   return (
     <button
       style={{
-        width,
-        height,
         fontSize,
+        backgroundColor: bgColor,
       }}
       {...rest}
-      className="p-2 rounded-xl hover:bg-slate-900 bg-slate-700 text-white transition-all flex items-center justify-center"
+      className="py-1 px-4 rounded-xl hover:bg-slate-900 bg-slate-700 text-white transition-all flex items-center justify-center min-w-20"
     >
       {text}
     </button>

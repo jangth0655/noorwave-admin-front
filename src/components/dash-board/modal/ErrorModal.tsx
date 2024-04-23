@@ -10,7 +10,7 @@ export default function ErrorModal({ errorMessage, onCloseModal }: Props) {
   return (
     <div className="bg-white w-[320px] h-48 rounded-xl shadow-lg flex justify-center items-center flex-col gap-4">
       <ErrorMessage text={errorMessage} />
-      <Button onClick={onCloseModal} height={30} width={100} text="확인" />
+      <Button onClick={onCloseModal} text="확인" />
     </div>
   );
 }
