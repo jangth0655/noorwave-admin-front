@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { formatYYYYMMDD } from '@/utils/formatDate';
 
-import { AddAndEditUserArgs, createUser } from '@/services/users';
+import { AddAndEditUserArgs, UserPurchase, createUser } from '@/services/users';
 import { ServerError } from '@/services/httpClient';
 
 import DashboardInput from '../DashboardInput';
@@ -21,16 +21,10 @@ import UserCalendarInput from '../UserCalendarInput';
 import DashboardOrderSelector from '../DashboardOrderSelector';
 import DashboardPhoneInput from '../DashboardPhoneInput';
 import { removeCookie } from '@/utils/cookieManage';
+import dayjs from 'dayjs';
 
 type Props = {
   onCloseCreateModal: () => void;
-};
-
-export type DateForm = {
-  date?: Date;
-  order?: number;
-  quantity?: number;
-  id?: number;
 };
 
 export type UserDataForm = {
@@ -38,7 +32,7 @@ export type UserDataForm = {
   email: string;
   phone: string;
   phoneType: string;
-  date: DateForm[];
+  date: UserPurchase[];
 };
 
 export default function UserCreateModal({ onCloseCreateModal }: Props) {
@@ -53,7 +47,14 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     control,
   } = useForm<UserDataForm>();
 
-  const [dates, setDates] = useState<DateForm[]>([]);
+  const [dates, setDates] = useState<UserPurchase[]>([
+    {
+      id: 0,
+      purchase_date: undefined,
+      purchase_order: undefined,
+      quantity: undefined,
+    },
+  ]);
   const [dateId, setDateId] = useState(0);
 
   const queryClient = useQueryClient();
@@ -80,12 +81,12 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
   const onAddDateInput = () => {
     clearErrors('date');
-    setDates((prev) => [...prev, { id: dateId, date: undefined }]);
-    setDateId(dateId + 1);
+    setDateId((prev) => prev + 1);
+    setDates((prev) => [...prev, { id: dateId + 1, date: undefined }]);
   };
 
   const onSubmit = (data: UserDataForm) => {
-    const { date, email, name, phone, phoneType } = data;
+    const { email, name, phone, phoneType } = data;
 
     if (isNotDates) {
       setError('date', {
@@ -94,29 +95,34 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
       });
       return;
     }
-
-    const filteredDates = date
-      .filter(({ date, order }) => date && order)
-      .map((item) => ({
-        purchase_order: item.order,
-        quantity: item.quantity,
-        purchase_date: formatYYYYMMDD(item.date),
-      }));
-
     const phoneNumber = phoneType + phone.substring(1);
 
-    createMutate({
-      email,
-      name,
-      phone: phoneNumber,
-      purchases: filteredDates,
-    });
+    const processedData = dates.map((item) => ({
+      purchase_order: Number(item.purchase_order),
+      quantity: Number(item.quantity),
+      purchase_date: formatYYYYMMDD(dayjs(item.purchase_date).toDate()),
+    }));
+
+    if (processedData && processedData.length !== 0) {
+      createMutate({
+        email,
+        name,
+        phone: phoneNumber,
+        purchases: processedData,
+      });
+      return;
+    } else {
+      setError('date', {
+        message: '구매이력을 추가해주세요.',
+        type: 'required',
+      });
+    }
   };
 
   const onResetDateFields = (dateId: number) => {
-    setValue(`date.${dateId}.order`, undefined);
+    setValue(`date.${dateId}.purchase_order`, undefined);
     setValue(`date.${dateId}.quantity`, undefined);
-    setValue(`date.${dateId}.date`, undefined);
+    setValue(`date.${dateId}.purchase_date`, undefined);
   };
 
   const onRemoveDateField = (targetId: number) => {
@@ -130,6 +136,19 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
     onCloseCreateModal();
     router.replace('/');
   };
+
+  const onChangeUpdateDates = (id: number, field: string, value: string) => {
+    setDates((prev) => {
+      return prev.map((item) => {
+        if (item.id === id) {
+          return { ...item, [field]: value };
+        }
+        return item;
+      });
+    });
+  };
+
+  const isExtraError = createError?.statusCode !== 400 && createError?.statusCode !== 422;
 
   return (
     <>
@@ -185,36 +204,54 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
 
           <ul className="flex flex-col gap-4 relative">
             {dates.length !== 0 &&
-              dates.map((date) => (
+              dates.map((date, index) => (
                 <li key={date.id} className="flex items-center justify-between">
-                  <DashboardOrderSelector
-                    register={register(`date.${date.id as number}.order`, {
-                      required: {
-                        message: '차수를 선택해주세요.',
-                        value: true,
-                      },
-                    })}
-                  />
-                  <Controller
-                    key={date.id}
-                    name={`date.${date.id as number}.date`}
-                    rules={{ required: true }}
-                    control={control}
-                    render={({ field }) => <UserCalendarInput field={field} />}
-                  />
+                  <div className="flex items-center gap-1">
+                    <DashboardOrderSelector
+                      register={register(`date.${date.id as number}.purchase_order`, {
+                        required: {
+                          message: '차수를 선택해주세요.',
+                          value: true,
+                        },
+                        onChange: (e) => {
+                          const value = e.target.value;
+                          onChangeUpdateDates(date.id!, 'purchase_order', value);
+                        },
+                      })}
+                    />
+                    <Controller
+                      key={date.id}
+                      name={`date.${date.id as number}.purchase_date`}
+                      rules={{
+                        required: true,
+                        onChange: (e) => {
+                          const value = e.target.value;
+                          onChangeUpdateDates(date.id!, 'purchase_date', value);
+                        },
+                      }}
+                      control={control}
+                      render={({ field }) => {
+                        return <UserCalendarInput field={field} />;
+                      }}
+                    />
 
-                  <DashboardInput
-                    register={register(`date.${date.id as number}.quantity`, {
-                      required: {
-                        message: '구매 수량을 입력해주세요.',
-                        value: true,
-                      },
-                    })}
-                    type="number"
-                    placeholder="구매수량"
-                  />
+                    <DashboardInput
+                      register={register(`date.${date.id as number}.quantity`, {
+                        required: {
+                          message: '구매 수량을 입력해주세요.',
+                          value: true,
+                        },
+                        onChange: (e) => {
+                          const value = e.target.value;
+                          onChangeUpdateDates(date.id!, 'quantity', value);
+                        },
+                      })}
+                      type="number"
+                      placeholder="구매수량"
+                    />
+                  </div>
 
-                  <div className="flex items-center gap-2 ml-1">
+                  <div className="flex items-center gap-2 ml-4 w-full">
                     <button
                       onClick={() => onResetDateFields(date.id as number)}
                       type="button"
@@ -222,13 +259,15 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
                     >
                       초기화
                     </button>
-                    <button
-                      onClick={() => onRemoveDateField(date.id as number)}
-                      type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      제거
-                    </button>
+                    {index === 0 ? null : (
+                      <button
+                        onClick={() => onRemoveDateField(date.id as number)}
+                        type="button"
+                        className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
+                      >
+                        제거
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}
@@ -241,18 +280,19 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
                 <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
               </div>
             )}
+            {(createError?.statusCode === 422 || createError?.statusCode === 400) && (
+              <div className="mt-4">
+                <ErrorMessage
+                  text={createError.statusCode === 422 ? '올바른 입력 값이 아닙니다.' : '이미 존재하는 계정입니다.'}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-6">
             <Button type="submit" text="저장" width={80} height={40} />
             <Button onClick={onCloseCreateModal} type="button" text="취소" width={80} height={40} />
           </div>
-
-          {createError?.statusCode === 422 && (
-            <div className="mt-4">
-              <ErrorMessage text="올바른 입력 값이 아닙니다." />
-            </div>
-          )}
         </form>
         {isCreateLoading && (
           <div className="absolute w-full h-full top-0 bottom-0 bg-black left-0 right-0 bg-opacity-50 overflow-hidden rounded-xl flex justify-center items-center flex-col gap-4">
@@ -262,16 +302,12 @@ export default function UserCreateModal({ onCloseCreateModal }: Props) {
         )}
       </UserModalWrapper>
 
-      {isError && createError.errorMessage && (
+      {isError && isExtraError && createError.errorMessage && (
         <Modal>
           <div>
             <ErrorModal
               errorMessage={createError.errorMessage}
-              onCloseModal={
-                createError.statusCode === 401 || createError.statusCode === 422
-                  ? onCloseModalAndOnHome
-                  : onCloseCreateModal
-              }
+              onCloseModal={createError.statusCode === 401 ? onCloseModalAndOnHome : onCloseCreateModal}
             />
           </div>
         </Modal>

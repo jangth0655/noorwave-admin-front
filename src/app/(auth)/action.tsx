@@ -4,12 +4,7 @@ import { ACCESS_TOKEN } from '@/utils/cookieManage';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-// export async function cookieAction(token: string) {
-//   cookies().set(ACCESS_TOKEN, token);
-//   redirect('/');
-// }
-
-export type LoginData = { access_token: string; token_type: string };
+type LoginData = { access_token: string; token_type: string };
 
 export async function cookieAction(prevState: any, formData: FormData) {
   const login_id = formData.get('email')?.toString();

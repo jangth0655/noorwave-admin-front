@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { User, getUsers } from '@/services/users';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,12 +14,13 @@ import { removeCookie } from '@/utils/cookieManage';
 
 type Props = {
   keyword?: string;
+  onSetCheckedUserId: (ids: number[]) => void;
+  checkedUserIds: number[];
 };
 
-export default function UserTableList({ keyword }: Props) {
+export default function UserTableList({ keyword, checkedUserIds, onSetCheckedUserId }: Props) {
   const router = useRouter();
   const [isErrorModal, setIsErrorModal] = useState(false);
-  const queryClient = useQueryClient();
   const {
     data: userList,
     isPending,
@@ -29,14 +30,6 @@ export default function UserTableList({ keyword }: Props) {
     queryKey: ['users', keyword],
     queryFn: () => getUsers(keyword),
   });
-
-  useEffect(() => {
-    if (keyword) {
-      queryClient.invalidateQueries({
-        queryKey: ['users'],
-      });
-    }
-  }, [keyword, queryClient]);
 
   useEffect(() => {
     if (error?.statusCode === 401) {
@@ -66,21 +59,25 @@ export default function UserTableList({ keyword }: Props) {
         {userList?.items?.length === 0 ? (
           <tbody>
             <tr>
-              <td colSpan={7} className="bg-slate-100 text-center">
+              <td colSpan={7} className="bg-slate-100 md:text-center">
                 검색 결과가 없습니다.
               </td>
             </tr>
           </tbody>
         ) : isPending ? (
           <tbody>
-            {Array.from({ length: 10 }).map((_, index) => (
+            {Array.from({ length: 15 }).map((_, index) => (
               <tr key={index} className="rounded-xl overflow-x-hidden *:rounded-md bg-slate-500 animate-pulse">
                 <td colSpan={7} className="p-5" />
               </tr>
             ))}
           </tbody>
         ) : (
-          <UserTableBody userList={userList?.items} />
+          <UserTableBody
+            userList={userList?.items}
+            checkedUserIds={checkedUserIds}
+            onSetCheckedUserId={onSetCheckedUserId}
+          />
         )}
       </table>
 

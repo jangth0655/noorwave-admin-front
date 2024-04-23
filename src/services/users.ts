@@ -5,6 +5,7 @@ export const getUsers = async (search?: string) => {
     await api.get<Promise<User>>('/user', {
       params: {
         search,
+        sort: '-id',
       },
     })
   ).data;
@@ -79,4 +80,5 @@ export type UserPurchase = {
   purchase_date?: string;
   purchase_order?: number;
   quantity?: number;
+  isNewItem?: boolean;
 };
