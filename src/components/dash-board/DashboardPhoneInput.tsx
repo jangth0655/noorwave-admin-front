@@ -23,7 +23,7 @@ export default function DashboardPhoneInput({
     <div>
       <div className="flex items-center gap-2">
         <label htmlFor="phone">휴대폰 번호</label>
-        <ErrorMessage text={errorMessage} />
+        <ErrorMessage text={errorMessage} fontSize={14} />
       </div>
       <div className="flex items-center">
         <select {...phoneTypeRegister} className="max-w-xs mr-2 border p-1 rounded-xl outline-none text-sm">

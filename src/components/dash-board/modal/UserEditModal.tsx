@@ -35,6 +35,7 @@ export type UserDataForm = {
 };
 
 export default function UserEditModal({ userDetail, onCloseDetailModal }: Props) {
+  const [isExistUserErrorModal, setIsExistUserErrorModal] = useState(false);
   const router = useRouter();
   const {
     setValue,
@@ -63,6 +64,9 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
       onCloseDetailModal();
     },
     onError: (error) => {
+      if (error.statusCode === 400) {
+        setIsExistUserErrorModal(true);
+      }
       if (error.statusCode === 401) {
         removeCookie();
       }
@@ -279,15 +283,9 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
                 <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
               </div>
             )}
-            {(error?.statusCode === 422 || error?.statusCode === 400) && (
-              <div className="mt-4">
-                <ErrorMessage
-                  text={
-                    error.statusCode === 422
-                      ? '올바른 입력 값이 아닙니다.'
-                      : '이메일 또는 휴대폰 번호가 이미 존재합니다.'
-                  }
-                />
+            {error?.statusCode === 422 && (
+              <div>
+                <ErrorMessage text="올바른 입력 값이 아닙니다." />
               </div>
             )}
           </div>
@@ -304,6 +302,16 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
           <Loading width={30} height={30} />
         </div>
       )}
+
+      {isExistUserErrorModal && (
+        <Modal>
+          <ErrorModal
+            errorMessage="이메일 또는 휴대폰 번호가 존재합니다."
+            onCloseModal={() => setIsExistUserErrorModal(false)}
+          />
+        </Modal>
+      )}
+
       {isError && isExtraError && error.errorMessage && (
         <Modal>
           <div>
