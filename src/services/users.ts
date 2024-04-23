@@ -80,4 +80,5 @@ export type UserPurchase = {
   purchase_date?: string;
   purchase_order?: number;
   quantity?: number;
+  isNewItem?: boolean;
 };
