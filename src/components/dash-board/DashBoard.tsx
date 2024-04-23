@@ -82,8 +82,8 @@ export default function DashBoard() {
         <div className="flex justify-between items-center mb-6 w-full">
           <UserSearchForm onKeyword={onKeyword} />
           <div className="hidden md:flex items-center gap-6">
-            <Button onClick={onCreateModal} text="추가" width={80} height={40} />
-            <Button onClick={onDeleteUser} text="선택 삭제" width={80} height={40} />
+            <Button onClick={onCreateModal} text="추가" />
+            <Button onClick={onDeleteUser} text="선택 삭제" />
           </div>
         </div>
       </div>
