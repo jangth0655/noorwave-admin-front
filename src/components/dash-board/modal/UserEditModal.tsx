@@ -282,7 +282,11 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
             {(error?.statusCode === 422 || error?.statusCode === 400) && (
               <div className="mt-4">
                 <ErrorMessage
-                  text={error.statusCode === 422 ? '올바른 입력 값이 아닙니다.' : '이미 존재하는 계정입니다.'}
+                  text={
+                    error.statusCode === 422
+                      ? '올바른 입력 값이 아닙니다.'
+                      : '이메일 또는 휴대폰 번호가 이미 존재합니다.'
+                  }
                 />
               </div>
             )}
