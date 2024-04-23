@@ -11,6 +11,7 @@ import Modal from '../Modal';
 import ErrorModal from './modal/ErrorModal';
 import { ServerError } from '@/services/httpClient';
 import { removeCookie } from '@/utils/cookieManage';
+import Loading from '../Loading';
 
 type Props = {
   keyword?: string;
@@ -54,7 +55,7 @@ export default function UserTableList({ keyword, checkedUserIds, onSetCheckedUse
 
   return (
     <div className="overflow-x-auto">
-      <table className="table">
+      <table className="table overflow-hidden">
         <TableHead headList={tableHead} />
         {userList?.items?.length === 0 ? (
           <tbody>
@@ -66,11 +67,11 @@ export default function UserTableList({ keyword, checkedUserIds, onSetCheckedUse
           </tbody>
         ) : isPending ? (
           <tbody>
-            {Array.from({ length: 15 }).map((_, index) => (
-              <tr key={index} className="rounded-xl overflow-x-hidden *:rounded-md bg-slate-500 animate-pulse">
-                <td colSpan={7} className="p-5" />
-              </tr>
-            ))}
+            <tr>
+              <td colSpan={7} className="p-5 w-full md:text-center">
+                <Loading />
+              </td>
+            </tr>
           </tbody>
         ) : (
           <UserTableBody
