@@ -143,6 +143,10 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
   };
 
   const onRemoveDateField = (targetId: number) => {
+    if (dates.length === 1) {
+      setError('date', { message: '구매이력을 작성해야 합니다.' });
+      return;
+    }
     clearErrors('date');
     const newData = dates.filter((item) => item.id !== targetId);
     setDates(newData);
@@ -154,6 +158,7 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
   };
 
   const onChangeUpdateDates = (id: number, field: string, value: string) => {
+    clearErrors('date');
     setDates((prev) => {
       return prev.map((item) => {
         if (item.id === id) {
@@ -279,9 +284,9 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
 
         <div className="my-5 flex items-center gap-2">
           <Button onClick={onAddDateInput} type="button" text="구매이력 추가" fontSize={14} />
-          {(errors.date || error?.statusCode === 422) && (
+          {errors.date && (
             <div>
-              <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
+              <ErrorMessage text="구매이력을 입력해야 합니다." />
             </div>
           )}
           {error?.statusCode === 422 && (
