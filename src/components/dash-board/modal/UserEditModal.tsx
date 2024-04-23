@@ -20,6 +20,7 @@ import ErrorModal from './ErrorModal';
 import Loading from '@/components/Loading';
 import DashboardPhoneInput from '../DashboardPhoneInput';
 import { removeCookie } from '@/utils/cookieManage';
+import UserModalWrapper from './UserModalWrapper';
 
 type Props = {
   userDetail: UserInfo;
@@ -166,136 +167,136 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
   const isExtraError = error?.statusCode !== 400 && error?.statusCode !== 422;
 
   return (
-    <>
-      <div className="bg-white w-[650px] p-4 px-10 rounded-xl shadow-lg">
-        <h1 className="mb-10 text-xl font-semibold">회원 정보 수정</h1>
+    <UserModalWrapper>
+      <h1 className="mb-10 text-xl font-semibold">회원 정보 수정</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-4 mb-6">
-            <DashboardInput
-              htmlFor={'name'}
-              labelText="이름"
-              register={register('name')}
-              defaultValue={userDetail.name}
-            />
-            <DashboardInput
-              htmlFor={'email'}
-              labelText="이메일 주소"
-              register={register('email')}
-              defaultValue={userDetail.email}
-            />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-4 mb-6">
+          <DashboardInput
+            htmlFor={'name'}
+            labelText="이름"
+            register={register('name')}
+            defaultValue={userDetail.name}
+          />
+          <DashboardInput
+            htmlFor={'email'}
+            labelText="이메일 주소"
+            register={register('email')}
+            defaultValue={userDetail.email}
+          />
 
-            <DashboardPhoneInput
-              errorMessage=""
-              phoneRegister={register('phone', {
-                required: {
-                  message: '휴대폰 번호를 입력해주세요.',
-                  value: true,
-                },
-              })}
-              phoneTypeRegister={register('phoneType', {
-                required: {
-                  message: '국가 번호를 선택해주세요.',
-                  value: true,
-                },
-              })}
-              phoneDefaultValue={userDetail.phone}
-            />
-          </div>
+          <DashboardPhoneInput
+            errorMessage=""
+            phoneRegister={register('phone', {
+              required: {
+                message: '휴대폰 번호를 입력해주세요.',
+                value: true,
+              },
+            })}
+            phoneTypeRegister={register('phoneType', {
+              required: {
+                message: '국가 번호를 선택해주세요.',
+                value: true,
+              },
+            })}
+            phoneDefaultValue={userDetail.phone}
+          />
+        </div>
 
-          <ul>
-            {dates &&
-              dates.length !== 0 &&
-              dates.map((item) => (
-                <li key={item.id} className="flex items-center relative justify-between mb-2 last:mb-0">
-                  <DashboardOrderSelector
-                    register={register(`date.${item.id as number}.purchase_order`, {
-                      required: {
-                        message: '차수를 선택해주세요.',
-                        value: true,
-                      },
-                      valueAsNumber: true,
-                      onChange: (e) => {
-                        const value = e.target.value;
-                        item.id && onChangeUpdateDates(item.id, 'purchase_order', value);
-                      },
-                    })}
-                    defaultValue={item.purchase_order}
+        <ul className="flex flex-col gap-1 relative">
+          {dates &&
+            dates.length !== 0 &&
+            dates.map((item) => (
+              <li key={item.id} className="flex items-center relative justify-between mb-2 last:mb-0">
+                <DashboardOrderSelector
+                  register={register(`date.${item.id as number}.purchase_order`, {
+                    required: {
+                      message: '차수를 선택해주세요.',
+                      value: true,
+                    },
+                    valueAsNumber: true,
+                    onChange: (e) => {
+                      const value = e.target.value;
+                      item.id && onChangeUpdateDates(item.id, 'purchase_order', value);
+                    },
+                  })}
+                  defaultValue={item.purchase_order}
+                />
+
+                <Controller
+                  name={`date.${item.id as number}.purchase_date`}
+                  rules={{
+                    required: {
+                      message: '날짜를 입력해주세요.',
+                      value: true,
+                    },
+                    onChange: (e) => {
+                      const value = e.target.value;
+                      item.id && onChangeUpdateDates(item.id, 'purchase_date', value);
+                    },
+                  }}
+                  control={control}
+                  defaultValue={item.purchase_date}
+                  render={({ field }) => <UserCalendarInput field={field} />}
+                />
+
+                <DashboardInput
+                  defaultValue={item.quantity}
+                  register={register(`date.${item.id as number}.quantity`, {
+                    required: {
+                      message: '구매 수량을 입력해주세요.',
+                      value: true,
+                    },
+                    valueAsNumber: true,
+                    onChange: (e) => {
+                      const value = e.target.value;
+                      item.id && onChangeUpdateDates(item.id, 'quantity', value);
+                    },
+                  })}
+                  type="number"
+                  placeholder="구매수량"
+                />
+                <div className="flex items-center gap-2 ml-4 w-full">
+                  <Button
+                    onClick={() => onResetDateFields(item.id!)}
+                    type="button"
+                    text="초기화"
+                    fontSize={14}
+                    bgColor="#6b7280"
                   />
 
-                  <Controller
-                    name={`date.${item.id as number}.purchase_date`}
-                    rules={{
-                      required: {
-                        message: '날짜를 입력해주세요.',
-                        value: true,
-                      },
-                      onChange: (e) => {
-                        const value = e.target.value;
-                        item.id && onChangeUpdateDates(item.id, 'purchase_date', value);
-                      },
-                    }}
-                    control={control}
-                    defaultValue={item.purchase_date}
-                    render={({ field }) => <UserCalendarInput field={field} />}
+                  <Button
+                    onClick={() => onRemoveDateField(item.id as number)}
+                    type="button"
+                    text="제거"
+                    bgColor="#334155d9"
+                    fontSize={14}
                   />
+                </div>
+              </li>
+            ))}
+        </ul>
 
-                  <DashboardInput
-                    defaultValue={item.quantity}
-                    register={register(`date.${item.id as number}.quantity`, {
-                      required: {
-                        message: '구매 수량을 입력해주세요.',
-                        value: true,
-                      },
-                      valueAsNumber: true,
-                      onChange: (e) => {
-                        const value = e.target.value;
-                        item.id && onChangeUpdateDates(item.id, 'quantity', value);
-                      },
-                    })}
-                    type="number"
-                    placeholder="구매수량"
-                  />
-                  <div className="flex items-center gap-2 ml-4 w-full">
-                    <button
-                      onClick={() => onResetDateFields(item.id!)}
-                      type="button"
-                      className="py-1 bg-slate-200 rounded-md w-20 hover:bg-slate-400 hover:text-white transition-all"
-                    >
-                      초기화
-                    </button>
-                    <button
-                      onClick={() => onRemoveDateField(item.id as number)}
-                      type="button"
-                      className="px-4 py-1 rounded-xl text-sm bg-slate-500 text-white hover:bg-slate-700 transition-all"
-                    >
-                      제거
-                    </button>
-                  </div>
-                </li>
-              ))}
-          </ul>
+        <div className="my-5 flex items-center gap-2">
+          <Button onClick={onAddDateInput} type="button" text="구매이력 추가" fontSize={14} />
+          {(errors.date || error?.statusCode === 422) && (
+            <div>
+              <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
+            </div>
+          )}
+          {error?.statusCode === 422 && (
+            <div>
+              <ErrorMessage text="올바른 입력 값이 아닙니다." />
+            </div>
+          )}
+        </div>
 
-          <div className="my-4 flex items-center gap-2">
-            <Button onClick={onAddDateInput} type="button" text="구매이력 추가" width={100} height={40} fontSize={14} />
-            {(errors.date || error?.statusCode === 422) && (
-              <div>
-                <ErrorMessage text="구매이력을 올바르게 입력해주세요." />
-              </div>
-            )}
-            {error?.statusCode === 422 && (
-              <div>
-                <ErrorMessage text="올바른 입력 값이 아닙니다." />
-              </div>
-            )}
-          </div>
+        <div className="flex items-center gap-2 justify-center mt-10">
+          <Button type="button" text="취소" onClick={onCloseDetailModal} />
+          <Button text="저장" />
+        </div>
+      </form>
 
-          <div className="flex items-center gap-2 justify-center mt-10">
-            <Button type="button" text="취소" onClick={onCloseDetailModal} width={80} height={40} />
-            <Button text="저장" width={80} height={40} />
-          </div>
-        </form>
-      </div>
       {isPending && (
         <div className="absolute w-full h-full top-0 bottom-0 bg-black left-0 right-0 bg-opacity-50 overflow-hidden rounded-xl flex justify-center items-center flex-col gap-4">
           <p className="text-gray-100 font-semibold">잠시만 기다려주세요.</p>
@@ -322,6 +323,6 @@ export default function UserEditModal({ userDetail, onCloseDetailModal }: Props)
           </div>
         </Modal>
       )}
-    </>
+    </UserModalWrapper>
   );
 }
